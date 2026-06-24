@@ -1,0 +1,15 @@
+.env
+*.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store
+
+code/C8/.env
+code/C8/__pycache__/
+code/C8/.pytest_cache/
+code/C8/tests/__pycache__/
+code/C8/rag_modules/__pycache__/
+code/C8/evaluation/__pycache__/
+code/C8/vector_index/
+code/C8/evaluation/latest_report.json

@@ -1,0 +1,2443 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-06-22T18:05:05",
+  "cases": [
+    {
+      "case_id": "single-ingredients-老干妈拌面",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "老干妈拌面"
+      ],
+      "turns": [
+        {
+          "user": "老干妈拌面需要什么食材",
+          "expectation": {
+            "expected_dish": "老干妈拌面",
+            "required_terms": [
+              "* 面",
+              "* 老干妈",
+              "* 酱油"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-steps-老干妈拌面",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "老干妈拌面"
+      ],
+      "turns": [
+        {
+          "user": "老干妈拌面怎么做",
+          "expectation": {
+            "expected_dish": "老干妈拌面",
+            "required_terms_any": [
+              "* 将水倒入锅中并煮沸",
+              "* 将面均匀放入锅中",
+              "* 在煮的过程注意搅拌，避免面粘成一坨"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-tips-老干妈拌面",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "老干妈拌面"
+      ],
+      "turns": [
+        {
+          "user": "老干妈拌面有什么制作技巧",
+          "expectation": {
+            "expected_dish": "老干妈拌面",
+            "required_terms_any": [
+              "* 将水倒入锅中并煮沸",
+              "* 将面均匀放入锅中"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-ingredients-煮泡面加蛋",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "煮泡面加蛋"
+      ],
+      "turns": [
+        {
+          "user": "煮泡面加蛋需要什么食材",
+          "expectation": {
+            "expected_dish": "煮泡面加蛋",
+            "required_terms": [
+              "泡面",
+              "鸡蛋",
+              "水"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-steps-煮泡面加蛋",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "煮泡面加蛋"
+      ],
+      "turns": [
+        {
+          "user": "煮泡面加蛋怎么做",
+          "expectation": {
+            "expected_dish": "煮泡面加蛋",
+            "required_terms_any": [
+              "先将水加热至沸腾（火候不做严格要求，使用",
+              "将取出的面饼放入锅中",
+              "将泡面里附带的佐料放入锅中"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-tips-煮泡面加蛋",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "煮泡面加蛋"
+      ],
+      "turns": [
+        {
+          "user": "煮泡面加蛋有什么制作技巧",
+          "expectation": {
+            "expected_dish": "煮泡面加蛋",
+            "required_terms_any": [
+              "本指南中的鸡蛋包括但不仅限于：生鸡蛋，熟",
+              "原材料泡面可在楼下便利店购买"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-ingredients-电饭煲三文鱼炊饭",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "电饭煲三文鱼炊饭"
+      ],
+      "turns": [
+        {
+          "user": "电饭煲三文鱼炊饭需要什么食材",
+          "expectation": {
+            "expected_dish": "电饭煲三文鱼炊饭",
+            "required_terms": [
+              "有盐牛油",
+              "三文鱼",
+              "米"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-steps-电饭煲三文鱼炊饭",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "电饭煲三文鱼炊饭"
+      ],
+      "turns": [
+        {
+          "user": "电饭煲三文鱼炊饭怎么做",
+          "expectation": {
+            "expected_dish": "电饭煲三文鱼炊饭",
+            "required_terms_any": [
+              "三文鱼去鳞，去骨",
+              "金菇、冬菇切碎",
+              "洗米三次"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-tips-电饭煲三文鱼炊饭",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "电饭煲三文鱼炊饭"
+      ],
+      "turns": [
+        {
+          "user": "电饭煲三文鱼炊饭有什么制作技巧",
+          "expectation": {
+            "expected_dish": "电饭煲三文鱼炊饭",
+            "required_terms_any": [
+              "三文鱼去鳞，去骨",
+              "金菇、冬菇切碎"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-ingredients-示例菜",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "示例菜"
+      ],
+      "turns": [
+        {
+          "user": "示例菜需要什么食材",
+          "expectation": {
+            "expected_dish": "示例菜",
+            "required_terms": [
+              "<!-- 在这里列出必需原料。以方便大家",
+              "<!-- 注意：某些原料已经在厨房采购部",
+              "<!-- 燃气灶, 饮用水, 锅, 食用"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-steps-示例菜",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "示例菜"
+      ],
+      "turns": [
+        {
+          "user": "示例菜怎么做",
+          "expectation": {
+            "expected_dish": "示例菜",
+            "required_terms_any": [
+              "<!-- 在这里详细描述做菜的全部流程。",
+              "<!-- 不允许使用不精准描述的词汇，例",
+              "<!-- 在这里，如果操作的食材不是“全"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-tips-示例菜",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "示例菜"
+      ],
+      "turns": [
+        {
+          "user": "示例菜有什么制作技巧",
+          "expectation": {
+            "expected_dish": "示例菜",
+            "required_terms_any": [
+              "<!-- 在这里额外补充一些注意事项、参",
+              "操作时，需要注意观察沸腾的水位线，如发现"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-ingredients-空气炸锅羊排",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "空气炸锅羊排"
+      ],
+      "turns": [
+        {
+          "user": "空气炸锅羊排需要什么食材",
+          "expectation": {
+            "expected_dish": "空气炸锅羊排",
+            "required_terms": [
+              "必备：羊排（推荐 JD 购买大庄园 新西",
+              "必备：黑椒混合牛排调味料（懒）",
+              "必备：蒜蓉酱（推荐川娃子的，同样是因为懒"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-steps-空气炸锅羊排",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "空气炸锅羊排"
+      ],
+      "turns": [
+        {
+          "user": "空气炸锅羊排怎么做",
+          "expectation": {
+            "expected_dish": "空气炸锅羊排",
+            "required_terms_any": [
+              "羊排放入碗中清水洗净血水",
+              "羊排用厨房纸吸干水分，双面抹上黑椒混合调",
+              "锡纸碗放上烤架，羊排放在烤架上，撒上罗勒"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-tips-空气炸锅羊排",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "空气炸锅羊排"
+      ],
+      "turns": [
+        {
+          "user": "空气炸锅羊排有什么制作技巧",
+          "expectation": {
+            "expected_dish": "空气炸锅羊排",
+            "required_terms_any": [
+              "推荐购买温控比较好的空气炸锅，不然可能会"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-ingredients-速冻汤圆",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "速冻汤圆"
+      ],
+      "turns": [
+        {
+          "user": "速冻汤圆需要什么食材",
+          "expectation": {
+            "expected_dish": "速冻汤圆",
+            "required_terms": [
+              "速冻汤圆",
+              "微波炉"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-steps-速冻汤圆",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "速冻汤圆"
+      ],
+      "turns": [
+        {
+          "user": "速冻汤圆怎么做",
+          "expectation": {
+            "expected_dish": "速冻汤圆",
+            "required_terms_any": [
+              "取出速冻汤圆，放入碗中。",
+              "倒入开水，直至浸没汤圆。",
+              "微波炉高火 4 分钟。"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-tips-速冻汤圆",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "速冻汤圆"
+      ],
+      "turns": [
+        {
+          "user": "速冻汤圆有什么制作技巧",
+          "expectation": {
+            "expected_dish": "速冻汤圆",
+            "required_terms_any": [
+              "注意先加汤圆再加热水，不要颠倒，不然汤圆",
+              "假如微波炉里碗太烫无法取出，可以用毛巾，"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-ingredients-空气炸锅鸡翅中",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "空气炸锅鸡翅中"
+      ],
+      "turns": [
+        {
+          "user": "空气炸锅鸡翅中需要什么食材",
+          "expectation": {
+            "expected_dish": "空气炸锅鸡翅中",
+            "required_terms": [
+              "必备：鸡翅中（推荐买泰森的奥尔良鸡翅中，",
+              "可选：罗勒碎（撒上去纯粹为了好看）",
+              "可选：云南单山蘸水（代替烧烤料）"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-steps-空气炸锅鸡翅中",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "空气炸锅鸡翅中"
+      ],
+      "turns": [
+        {
+          "user": "空气炸锅鸡翅中怎么做",
+          "expectation": {
+            "expected_dish": "空气炸锅鸡翅中",
+            "required_terms_any": [
+              "鸡翅从冰箱拿出来，鸡翼面朝下放入锡纸烤盘",
+              "撒上罗勒碎，空气炸锅 200°C，10 ",
+              "翻面，撒上罗勒碎，空气炸锅 200°C，"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-tips-空气炸锅鸡翅中",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "空气炸锅鸡翅中"
+      ],
+      "turns": [
+        {
+          "user": "空气炸锅鸡翅中有什么制作技巧",
+          "expectation": {
+            "expected_dish": "空气炸锅鸡翅中",
+            "required_terms_any": [
+              "推荐购买温控比较好的空气炸锅，不然可能会"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-ingredients-煎饺",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "煎饺"
+      ],
+      "turns": [
+        {
+          "user": "煎饺需要什么食材",
+          "expectation": {
+            "expected_dish": "煎饺",
+            "required_terms": [
+              "饺子（速冻水饺）"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-steps-煎饺",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "煎饺"
+      ],
+      "turns": [
+        {
+          "user": "煎饺怎么做",
+          "expectation": {
+            "expected_dish": "煎饺",
+            "required_terms_any": [
+              "取出平底锅（不沾平底锅最佳）",
+              "加入 10ml - 15 ml 食用油",
+              "开火，放入饺子（尽量平均铺开，不宜堆叠）"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-tips-煎饺",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "煎饺"
+      ],
+      "turns": [
+        {
+          "user": "煎饺有什么制作技巧",
+          "expectation": {
+            "expected_dish": "煎饺",
+            "required_terms_any": [
+              "操作时，需时刻观察锅内情况，切记不可分神"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-ingredients-吐司果酱",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "吐司果酱"
+      ],
+      "turns": [
+        {
+          "user": "吐司果酱需要什么食材",
+          "expectation": {
+            "expected_dish": "吐司果酱",
+            "required_terms": [
+              "新鲜吐司",
+              "果酱",
+              "面包机"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-steps-吐司果酱",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "吐司果酱"
+      ],
+      "turns": [
+        {
+          "user": "吐司果酱怎么做",
+          "expectation": {
+            "expected_dish": "吐司果酱",
+            "required_terms_any": [
+              "将吐司放入面包机",
+              "设置好档位,时间到了会自动弹出",
+              "两分钟后吐司加热完成弹出"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-tips-吐司果酱",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "吐司果酱"
+      ],
+      "turns": [
+        {
+          "user": "吐司果酱有什么制作技巧",
+          "expectation": {
+            "expected_dish": "吐司果酱",
+            "required_terms_any": [
+              "面包机一般不会超过一百块,吐司去楼下超市"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-ingredients-美式炒蛋",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "美式炒蛋"
+      ],
+      "turns": [
+        {
+          "user": "美式炒蛋需要什么食材",
+          "expectation": {
+            "expected_dish": "美式炒蛋",
+            "required_terms": [
+              "鸡蛋",
+              "全脂牛奶/奶油",
+              "黄油"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-steps-美式炒蛋",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "美式炒蛋"
+      ],
+      "turns": [
+        {
+          "user": "美式炒蛋怎么做",
+          "expectation": {
+            "expected_dish": "美式炒蛋",
+            "required_terms_any": [
+              "鸡蛋打入大碗中，加盐搅打至起泡，静置 1",
+              "黄油切小块入锅，倒入蛋液，开小火不断搅拌",
+              "黄油一融化，就快速翻动蛋液，将其打碎成细"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-tips-美式炒蛋",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "美式炒蛋"
+      ],
+      "turns": [
+        {
+          "user": "美式炒蛋有什么制作技巧",
+          "expectation": {
+            "expected_dish": "美式炒蛋",
+            "required_terms_any": [
+              "想吃的更丰富可以在最后一步那里加上炒好的",
+              "使用平底锅（不粘锅）。"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-ingredients-水煮鱼",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "水煮鱼"
+      ],
+      "turns": [
+        {
+          "user": "水煮鱼需要什么食材",
+          "expectation": {
+            "expected_dish": "水煮鱼",
+            "required_terms": [
+              "巴沙鱼",
+              "蔬菜（比如土豆片/豆芽/花菜/生菜/……",
+              "红油豆瓣酱"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-steps-水煮鱼",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "水煮鱼"
+      ],
+      "turns": [
+        {
+          "user": "水煮鱼怎么做",
+          "expectation": {
+            "expected_dish": "水煮鱼",
+            "required_terms_any": [
+              "准备：巴沙鱼若是从冷冻柜里取出，需要放室",
+              "切片：巴沙鱼撇成薄片，约 5cm 长，3",
+              "[腌制](../../tips/lear"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-tips-水煮鱼",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "水煮鱼"
+      ],
+      "turns": [
+        {
+          "user": "水煮鱼有什么制作技巧",
+          "expectation": {
+            "expected_dish": "水煮鱼",
+            "required_terms_any": [
+              "垫底的蔬菜组合及用量可自由发挥，但需要注",
+              "红油豆瓣酱（辣度）以及盐的用量可根据个人"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-ingredients-白灼虾",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "白灼虾"
+      ],
+      "turns": [
+        {
+          "user": "白灼虾需要什么食材",
+          "expectation": {
+            "expected_dish": "白灼虾",
+            "required_terms": [
+              "活虾",
+              "洋葱",
+              "姜"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-steps-白灼虾",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "白灼虾"
+      ],
+      "turns": [
+        {
+          "user": "白灼虾怎么做",
+          "expectation": {
+            "expected_dish": "白灼虾",
+            "required_terms_any": [
+              "洋葱切小块，姜切片，平铺平底锅。",
+              "活虾冲洗一下（去除虾线、剪刀减掉虾腿虾须",
+              "锅内倒入料酒，盖上锅盖，中火 1 分钟，"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-tips-白灼虾",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "白灼虾"
+      ],
+      "turns": [
+        {
+          "user": "白灼虾有什么制作技巧",
+          "expectation": {
+            "expected_dish": "白灼虾",
+            "required_terms_any": [
+              "技术细节：",
+              "开始不能大火、防止糊底。"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-ingredients-小龙虾",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "小龙虾"
+      ],
+      "turns": [
+        {
+          "user": "小龙虾需要什么食材",
+          "expectation": {
+            "expected_dish": "小龙虾",
+            "required_terms": [
+              "小龙虾",
+              "油",
+              "香叶"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-steps-小龙虾",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "小龙虾"
+      ],
+      "turns": [
+        {
+          "user": "小龙虾怎么做",
+          "expectation": {
+            "expected_dish": "小龙虾",
+            "required_terms_any": [
+              "小龙虾刷干净去虾线，葱切 2cm 葱段，",
+              "烧油，油微热, 下香叶、八角、桂皮、青花",
+              "香料出香气之后下锅葱姜蒜"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-tips-小龙虾",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "小龙虾"
+      ],
+      "turns": [
+        {
+          "user": "小龙虾有什么制作技巧",
+          "expectation": {
+            "expected_dish": "小龙虾",
+            "required_terms_any": [
+              "饭店应该都是油炸一遍，家庭油炸的话，太浪",
+              "去虾线后的虾肉比不去虾线的虾肉口感差一些"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-ingredients-皮蛋瘦肉粥",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "皮蛋瘦肉粥"
+      ],
+      "turns": [
+        {
+          "user": "皮蛋瘦肉粥需要什么食材",
+          "expectation": {
+            "expected_dish": "皮蛋瘦肉粥",
+            "required_terms": [
+              "* 饮用水",
+              "* 皮蛋（松花蛋）",
+              "* 瘦肉"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-steps-皮蛋瘦肉粥",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "皮蛋瘦肉粥"
+      ],
+      "turns": [
+        {
+          "user": "皮蛋瘦肉粥怎么做",
+          "expectation": {
+            "expected_dish": "皮蛋瘦肉粥",
+            "required_terms_any": [
+              "### 主料",
+              "* 大米 - 洗净 - 放入电饭锅内胆 ",
+              "* 瘦肉 - 洗净 - 简易晾去水分 -"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-tips-皮蛋瘦肉粥",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "皮蛋瘦肉粥"
+      ],
+      "turns": [
+        {
+          "user": "皮蛋瘦肉粥有什么制作技巧",
+          "expectation": {
+            "expected_dish": "皮蛋瘦肉粥",
+            "required_terms_any": [
+              "* 作为早餐时可提前一夜准备好主料，保温"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-ingredients-勾芡香菇汤",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "勾芡香菇汤"
+      ],
+      "turns": [
+        {
+          "user": "勾芡香菇汤需要什么食材",
+          "expectation": {
+            "expected_dish": "勾芡香菇汤",
+            "required_terms": [
+              "* 香菇",
+              "* 香葱",
+              "* 食用油"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-steps-勾芡香菇汤",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "勾芡香菇汤"
+      ],
+      "turns": [
+        {
+          "user": "勾芡香菇汤怎么做",
+          "expectation": {
+            "expected_dish": "勾芡香菇汤",
+            "required_terms_any": [
+              "* 香菇切片（每片厚度 0.5-1 cm",
+              "* 生粉倒入小碗中，加入 50ml 水，",
+              "* 倒掉碗中的盐水，适当去掉香菇本身的水"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-tips-勾芡香菇汤",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "勾芡香菇汤"
+      ],
+      "turns": [
+        {
+          "user": "勾芡香菇汤有什么制作技巧",
+          "expectation": {
+            "expected_dish": "勾芡香菇汤",
+            "required_terms_any": [
+              "* 香菇切片（每片厚度 0.5-1 cm",
+              "* 生粉倒入小碗中，加入 50ml 水，"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-ingredients-奶油蘑菇汤",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "奶油蘑菇汤"
+      ],
+      "turns": [
+        {
+          "user": "奶油蘑菇汤需要什么食材",
+          "expectation": {
+            "expected_dish": "奶油蘑菇汤",
+            "required_terms": [
+              "白蘑菇",
+              "洋葱",
+              "黄油"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-steps-奶油蘑菇汤",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "奶油蘑菇汤"
+      ],
+      "turns": [
+        {
+          "user": "奶油蘑菇汤怎么做",
+          "expectation": {
+            "expected_dish": "奶油蘑菇汤",
+            "required_terms_any": [
+              "白蘑菇切片备用，洋葱切末备用。",
+              "平底锅中放入黄油，小火融化后加入洋葱炒至",
+              "加入白蘑菇翻炒至出水变软，撒入面粉搅拌均"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-tips-奶油蘑菇汤",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "奶油蘑菇汤"
+      ],
+      "turns": [
+        {
+          "user": "奶油蘑菇汤有什么制作技巧",
+          "expectation": {
+            "expected_dish": "奶油蘑菇汤",
+            "required_terms_any": [
+              "可将部分蘑菇预留作为装饰，提前煎香再添加",
+              "使用鸡高汤代替清水风味更佳，建议控制总液"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-ingredients-酸奶意式奶冻",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "酸奶意式奶冻"
+      ],
+      "turns": [
+        {
+          "user": "酸奶意式奶冻需要什么食材",
+          "expectation": {
+            "expected_dish": "酸奶意式奶冻",
+            "required_terms": [
+              "淡奶油",
+              "糖",
+              "原味酸奶"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-steps-酸奶意式奶冻",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "酸奶意式奶冻"
+      ],
+      "turns": [
+        {
+          "user": "酸奶意式奶冻怎么做",
+          "expectation": {
+            "expected_dish": "酸奶意式奶冻",
+            "required_terms_any": [
+              "吉利丁片剪成小片，泡入冷水中",
+              "淡奶油和糖放入锅中，加热至 60 度",
+              "关火，吉利丁从水中取出，控干水份，加入热"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-tips-酸奶意式奶冻",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "酸奶意式奶冻"
+      ],
+      "turns": [
+        {
+          "user": "酸奶意式奶冻有什么制作技巧",
+          "expectation": {
+            "expected_dish": "酸奶意式奶冻",
+            "required_terms_any": [
+              "传统版本的意式奶冻只用淡奶油，且糖量更大"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-ingredients-烤蛋挞",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "烤蛋挞"
+      ],
+      "turns": [
+        {
+          "user": "烤蛋挞需要什么食材",
+          "expectation": {
+            "expected_dish": "烤蛋挞",
+            "required_terms": [
+              "该配方为整包蛋挞皮所需量 填充后可直接冷",
+              "蛋挞皮 品牌不限",
+              "鸡蛋"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-steps-烤蛋挞",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "烤蛋挞"
+      ],
+      "turns": [
+        {
+          "user": "烤蛋挞怎么做",
+          "expectation": {
+            "expected_dish": "烤蛋挞",
+            "required_terms_any": [
+              "将碗置于克数称上 称量 450 克 淡奶",
+              "加入 80 克白砂糖 （甜度中等 可按个",
+              "加入 200 克牛奶 （牛奶密度在此处记"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "single-tips-烤蛋挞",
+      "scenario_type": "single_turn_detail",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "烤蛋挞"
+      ],
+      "turns": [
+        {
+          "user": "烤蛋挞有什么制作技巧",
+          "expectation": {
+            "expected_dish": "烤蛋挞",
+            "required_terms_any": [
+              "操作时 请务必小心烤箱高温 防止烫伤"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "category-主食",
+      "scenario_type": "category_recommendation",
+      "evaluation_mode": "strict",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "推荐几个主食",
+          "expectation": {
+            "required_terms_any": [
+              "主食",
+              "1.",
+              "2."
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "category-半成品",
+      "scenario_type": "category_recommendation",
+      "evaluation_mode": "strict",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "推荐几个半成品",
+          "expectation": {
+            "required_terms_any": [
+              "半成品",
+              "1.",
+              "2."
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "category-早餐",
+      "scenario_type": "category_recommendation",
+      "evaluation_mode": "strict",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "推荐几个早餐",
+          "expectation": {
+            "required_terms_any": [
+              "早餐",
+              "1.",
+              "2."
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "category-水产",
+      "scenario_type": "category_recommendation",
+      "evaluation_mode": "strict",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "推荐几个水产",
+          "expectation": {
+            "required_terms_any": [
+              "水产",
+              "1.",
+              "2."
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "category-汤品",
+      "scenario_type": "category_recommendation",
+      "evaluation_mode": "strict",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "推荐几个汤品",
+          "expectation": {
+            "required_terms_any": [
+              "汤品",
+              "1.",
+              "2."
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "category-甜品",
+      "scenario_type": "category_recommendation",
+      "evaluation_mode": "strict",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "推荐几个甜品",
+          "expectation": {
+            "required_terms_any": [
+              "甜品",
+              "1.",
+              "2."
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "category-素菜",
+      "scenario_type": "category_recommendation",
+      "evaluation_mode": "strict",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "推荐几个素菜",
+          "expectation": {
+            "required_terms_any": [
+              "素菜",
+              "1.",
+              "2."
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "category-荤菜",
+      "scenario_type": "category_recommendation",
+      "evaluation_mode": "strict",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "推荐几个荤菜",
+          "expectation": {
+            "required_terms_any": [
+              "荤菜",
+              "1.",
+              "2."
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "multi-explicit-老干妈拌面",
+      "scenario_type": "multi_turn_followup",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "老干妈拌面"
+      ],
+      "turns": [
+        {
+          "user": "我们聊聊老干妈拌面",
+          "expectation": {
+            "expected_dish": "老干妈拌面",
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "它需要什么食材",
+          "expectation": {
+            "expected_dish": "老干妈拌面",
+            "required_terms_any": [
+              "* 面",
+              "* 老干妈",
+              "* 酱油"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "再说一下怎么做",
+          "expectation": {
+            "expected_dish": "老干妈拌面",
+            "required_terms_any": [
+              "* 将水倒入锅中并煮沸",
+              "* 将面均匀放入锅中",
+              "* 在煮的过程注意搅拌，避免面粘成一坨"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "multi-explicit-煮泡面加蛋",
+      "scenario_type": "multi_turn_followup",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "煮泡面加蛋"
+      ],
+      "turns": [
+        {
+          "user": "我们聊聊煮泡面加蛋",
+          "expectation": {
+            "expected_dish": "煮泡面加蛋",
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "它需要什么食材",
+          "expectation": {
+            "expected_dish": "煮泡面加蛋",
+            "required_terms_any": [
+              "泡面",
+              "鸡蛋",
+              "水"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "再说一下怎么做",
+          "expectation": {
+            "expected_dish": "煮泡面加蛋",
+            "required_terms_any": [
+              "先将水加热至沸腾（火候不做严格要求，使用",
+              "将取出的面饼放入锅中",
+              "将泡面里附带的佐料放入锅中"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "multi-explicit-电饭煲三文鱼炊饭",
+      "scenario_type": "multi_turn_followup",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "电饭煲三文鱼炊饭"
+      ],
+      "turns": [
+        {
+          "user": "我们聊聊电饭煲三文鱼炊饭",
+          "expectation": {
+            "expected_dish": "电饭煲三文鱼炊饭",
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "它需要什么食材",
+          "expectation": {
+            "expected_dish": "电饭煲三文鱼炊饭",
+            "required_terms_any": [
+              "有盐牛油",
+              "三文鱼",
+              "米"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "再说一下怎么做",
+          "expectation": {
+            "expected_dish": "电饭煲三文鱼炊饭",
+            "required_terms_any": [
+              "三文鱼去鳞，去骨",
+              "金菇、冬菇切碎",
+              "洗米三次"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "multi-explicit-示例菜",
+      "scenario_type": "multi_turn_followup",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "示例菜"
+      ],
+      "turns": [
+        {
+          "user": "我们聊聊示例菜",
+          "expectation": {
+            "expected_dish": "示例菜",
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "它需要什么食材",
+          "expectation": {
+            "expected_dish": "示例菜",
+            "required_terms_any": [
+              "<!-- 在这里列出必需原料。以方便大家",
+              "<!-- 注意：某些原料已经在厨房采购部",
+              "<!-- 燃气灶, 饮用水, 锅, 食用"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "再说一下怎么做",
+          "expectation": {
+            "expected_dish": "示例菜",
+            "required_terms_any": [
+              "<!-- 在这里详细描述做菜的全部流程。",
+              "<!-- 不允许使用不精准描述的词汇，例",
+              "<!-- 在这里，如果操作的食材不是“全"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "multi-explicit-空气炸锅羊排",
+      "scenario_type": "multi_turn_followup",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "空气炸锅羊排"
+      ],
+      "turns": [
+        {
+          "user": "我们聊聊空气炸锅羊排",
+          "expectation": {
+            "expected_dish": "空气炸锅羊排",
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "它需要什么食材",
+          "expectation": {
+            "expected_dish": "空气炸锅羊排",
+            "required_terms_any": [
+              "必备：羊排（推荐 JD 购买大庄园 新西",
+              "必备：黑椒混合牛排调味料（懒）",
+              "必备：蒜蓉酱（推荐川娃子的，同样是因为懒"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "再说一下怎么做",
+          "expectation": {
+            "expected_dish": "空气炸锅羊排",
+            "required_terms_any": [
+              "羊排放入碗中清水洗净血水",
+              "羊排用厨房纸吸干水分，双面抹上黑椒混合调",
+              "锡纸碗放上烤架，羊排放在烤架上，撒上罗勒"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "multi-explicit-速冻汤圆",
+      "scenario_type": "multi_turn_followup",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "速冻汤圆"
+      ],
+      "turns": [
+        {
+          "user": "我们聊聊速冻汤圆",
+          "expectation": {
+            "expected_dish": "速冻汤圆",
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "它需要什么食材",
+          "expectation": {
+            "expected_dish": "速冻汤圆",
+            "required_terms_any": [
+              "速冻汤圆",
+              "微波炉"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "再说一下怎么做",
+          "expectation": {
+            "expected_dish": "速冻汤圆",
+            "required_terms_any": [
+              "取出速冻汤圆，放入碗中。",
+              "倒入开水，直至浸没汤圆。",
+              "微波炉高火 4 分钟。"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "multi-explicit-空气炸锅鸡翅中",
+      "scenario_type": "multi_turn_followup",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "空气炸锅鸡翅中"
+      ],
+      "turns": [
+        {
+          "user": "我们聊聊空气炸锅鸡翅中",
+          "expectation": {
+            "expected_dish": "空气炸锅鸡翅中",
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "它需要什么食材",
+          "expectation": {
+            "expected_dish": "空气炸锅鸡翅中",
+            "required_terms_any": [
+              "必备：鸡翅中（推荐买泰森的奥尔良鸡翅中，",
+              "可选：罗勒碎（撒上去纯粹为了好看）",
+              "可选：云南单山蘸水（代替烧烤料）"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "再说一下怎么做",
+          "expectation": {
+            "expected_dish": "空气炸锅鸡翅中",
+            "required_terms_any": [
+              "鸡翅从冰箱拿出来，鸡翼面朝下放入锡纸烤盘",
+              "撒上罗勒碎，空气炸锅 200°C，10 ",
+              "翻面，撒上罗勒碎，空气炸锅 200°C，"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "multi-explicit-煎饺",
+      "scenario_type": "multi_turn_followup",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "煎饺"
+      ],
+      "turns": [
+        {
+          "user": "我们聊聊煎饺",
+          "expectation": {
+            "expected_dish": "煎饺",
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "它需要什么食材",
+          "expectation": {
+            "expected_dish": "煎饺",
+            "required_terms_any": [
+              "饺子（速冻水饺）"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "再说一下怎么做",
+          "expectation": {
+            "expected_dish": "煎饺",
+            "required_terms_any": [
+              "取出平底锅（不沾平底锅最佳）",
+              "加入 10ml - 15 ml 食用油",
+              "开火，放入饺子（尽量平均铺开，不宜堆叠）"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "multi-explicit-吐司果酱",
+      "scenario_type": "multi_turn_followup",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "吐司果酱"
+      ],
+      "turns": [
+        {
+          "user": "我们聊聊吐司果酱",
+          "expectation": {
+            "expected_dish": "吐司果酱",
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "它需要什么食材",
+          "expectation": {
+            "expected_dish": "吐司果酱",
+            "required_terms_any": [
+              "新鲜吐司",
+              "果酱",
+              "面包机"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "再说一下怎么做",
+          "expectation": {
+            "expected_dish": "吐司果酱",
+            "required_terms_any": [
+              "将吐司放入面包机",
+              "设置好档位,时间到了会自动弹出",
+              "两分钟后吐司加热完成弹出"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "multi-explicit-美式炒蛋",
+      "scenario_type": "multi_turn_followup",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "美式炒蛋"
+      ],
+      "turns": [
+        {
+          "user": "我们聊聊美式炒蛋",
+          "expectation": {
+            "expected_dish": "美式炒蛋",
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "它需要什么食材",
+          "expectation": {
+            "expected_dish": "美式炒蛋",
+            "required_terms_any": [
+              "鸡蛋",
+              "全脂牛奶/奶油",
+              "黄油"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "再说一下怎么做",
+          "expectation": {
+            "expected_dish": "美式炒蛋",
+            "required_terms_any": [
+              "鸡蛋打入大碗中，加盐搅打至起泡，静置 1",
+              "黄油切小块入锅，倒入蛋液，开小火不断搅拌",
+              "黄油一融化，就快速翻动蛋液，将其打碎成细"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "multi-explicit-水煮鱼",
+      "scenario_type": "multi_turn_followup",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "水煮鱼"
+      ],
+      "turns": [
+        {
+          "user": "我们聊聊水煮鱼",
+          "expectation": {
+            "expected_dish": "水煮鱼",
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "它需要什么食材",
+          "expectation": {
+            "expected_dish": "水煮鱼",
+            "required_terms_any": [
+              "巴沙鱼",
+              "蔬菜（比如土豆片/豆芽/花菜/生菜/……",
+              "红油豆瓣酱"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "再说一下怎么做",
+          "expectation": {
+            "expected_dish": "水煮鱼",
+            "required_terms_any": [
+              "准备：巴沙鱼若是从冷冻柜里取出，需要放室",
+              "切片：巴沙鱼撇成薄片，约 5cm 长，3",
+              "[腌制](../../tips/lear"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "multi-explicit-白灼虾",
+      "scenario_type": "multi_turn_followup",
+      "evaluation_mode": "strict",
+      "source_dishes": [
+        "白灼虾"
+      ],
+      "turns": [
+        {
+          "user": "我们聊聊白灼虾",
+          "expectation": {
+            "expected_dish": "白灼虾",
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "它需要什么食材",
+          "expectation": {
+            "expected_dish": "白灼虾",
+            "required_terms_any": [
+              "活虾",
+              "洋葱",
+              "姜"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        },
+        {
+          "user": "再说一下怎么做",
+          "expectation": {
+            "expected_dish": "白灼虾",
+            "required_terms_any": [
+              "洋葱切小块，姜切片，平铺平底锅。",
+              "活虾冲洗一下（去除虾线、剪刀减掉虾腿虾须",
+              "锅内倒入料酒，盖上锅盖，中火 1 分钟，"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "ambiguous-1",
+      "scenario_type": "ambiguous_related",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "今天吃什么",
+          "expectation": {
+            "required_terms_any": [
+              "推荐",
+              "可以",
+              "菜",
+              "吃"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "ambiguous-2",
+      "scenario_type": "ambiguous_related",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "我想吃点清淡的",
+          "expectation": {
+            "required_terms_any": [
+              "推荐",
+              "可以",
+              "菜",
+              "吃"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "ambiguous-3",
+      "scenario_type": "ambiguous_related",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "想做个快手菜",
+          "expectation": {
+            "required_terms_any": [
+              "推荐",
+              "可以",
+              "菜",
+              "吃"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "ambiguous-4",
+      "scenario_type": "ambiguous_related",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "晚上来点下饭的吧",
+          "expectation": {
+            "required_terms_any": [
+              "推荐",
+              "可以",
+              "菜",
+              "吃"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "ambiguous-5",
+      "scenario_type": "ambiguous_related",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "给我推荐一个新手友好的菜",
+          "expectation": {
+            "required_terms_any": [
+              "推荐",
+              "可以",
+              "菜",
+              "吃"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "ambiguous-6",
+      "scenario_type": "ambiguous_related",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "想整点甜的",
+          "expectation": {
+            "required_terms_any": [
+              "推荐",
+              "可以",
+              "菜",
+              "吃"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "ambiguous-7",
+      "scenario_type": "ambiguous_related",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "有没有适合早餐的",
+          "expectation": {
+            "required_terms_any": [
+              "推荐",
+              "可以",
+              "菜",
+              "吃"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "ambiguous-8",
+      "scenario_type": "ambiguous_related",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "来个适合夏天吃的菜",
+          "expectation": {
+            "required_terms_any": [
+              "推荐",
+              "可以",
+              "菜",
+              "吃"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "ambiguous-9",
+      "scenario_type": "ambiguous_related",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "我冰箱里东西不多，做点啥",
+          "expectation": {
+            "required_terms_any": [
+              "推荐",
+              "可以",
+              "菜",
+              "吃"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "ambiguous-10",
+      "scenario_type": "ambiguous_related",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "想吃口味重点的菜",
+          "expectation": {
+            "required_terms_any": [
+              "推荐",
+              "可以",
+              "菜",
+              "吃"
+            ],
+            "response_policy": "grounded_answer"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "temporal-1",
+      "scenario_type": "temporal_unknown",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "我昨天吃了什么",
+          "expectation": {
+            "required_terms_any": [
+              "不知道",
+              "不清楚",
+              "可以",
+              "推荐"
+            ],
+            "forbidden_terms": [
+              "鸡蛋三明治",
+              "红烧鲤鱼",
+              "长岛冰茶"
+            ],
+            "response_policy": "polite_fallback"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "temporal-2",
+      "scenario_type": "temporal_unknown",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "我上周做过哪道菜",
+          "expectation": {
+            "required_terms_any": [
+              "不知道",
+              "不清楚",
+              "可以",
+              "推荐"
+            ],
+            "forbidden_terms": [
+              "鸡蛋三明治",
+              "红烧鲤鱼",
+              "长岛冰茶"
+            ],
+            "response_policy": "polite_fallback"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "temporal-3",
+      "scenario_type": "temporal_unknown",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "你记得我前天晚饭吃了啥吗",
+          "expectation": {
+            "required_terms_any": [
+              "不知道",
+              "不清楚",
+              "可以",
+              "推荐"
+            ],
+            "forbidden_terms": [
+              "鸡蛋三明治",
+              "红烧鲤鱼",
+              "长岛冰茶"
+            ],
+            "response_policy": "polite_fallback"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "temporal-4",
+      "scenario_type": "temporal_unknown",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "我明天中午会吃什么",
+          "expectation": {
+            "required_terms_any": [
+              "不知道",
+              "不清楚",
+              "可以",
+              "推荐"
+            ],
+            "forbidden_terms": [
+              "鸡蛋三明治",
+              "红烧鲤鱼",
+              "长岛冰茶"
+            ],
+            "response_policy": "polite_fallback"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "temporal-5",
+      "scenario_type": "temporal_unknown",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "我上次煮的汤是哪一种",
+          "expectation": {
+            "required_terms_any": [
+              "不知道",
+              "不清楚",
+              "可以",
+              "推荐"
+            ],
+            "forbidden_terms": [
+              "鸡蛋三明治",
+              "红烧鲤鱼",
+              "长岛冰茶"
+            ],
+            "response_policy": "polite_fallback"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "temporal-6",
+      "scenario_type": "temporal_unknown",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "你知道我昨晚喝了什么吗",
+          "expectation": {
+            "required_terms_any": [
+              "不知道",
+              "不清楚",
+              "可以",
+              "推荐"
+            ],
+            "forbidden_terms": [
+              "鸡蛋三明治",
+              "红烧鲤鱼",
+              "长岛冰茶"
+            ],
+            "response_policy": "polite_fallback"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "irrelevant-1",
+      "scenario_type": "irrelevant_question",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "不锈钢玻璃怎么清洗",
+          "expectation": {
+            "required_terms_any": [
+              "不是",
+              "不清楚",
+              "可以",
+              "如果你愿意"
+            ],
+            "response_policy": "polite_fallback"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "irrelevant-2",
+      "scenario_type": "irrelevant_question",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "路由器总断网怎么办",
+          "expectation": {
+            "required_terms_any": [
+              "不是",
+              "不清楚",
+              "可以",
+              "如果你愿意"
+            ],
+            "response_policy": "polite_fallback"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "irrelevant-3",
+      "scenario_type": "irrelevant_question",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "手机壳发黄怎么处理",
+          "expectation": {
+            "required_terms_any": [
+              "不是",
+              "不清楚",
+              "可以",
+              "如果你愿意"
+            ],
+            "response_policy": "polite_fallback"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "irrelevant-4",
+      "scenario_type": "irrelevant_question",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "羽绒服怎么洗不结团",
+          "expectation": {
+            "required_terms_any": [
+              "不是",
+              "不清楚",
+              "可以",
+              "如果你愿意"
+            ],
+            "response_policy": "polite_fallback"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "irrelevant-5",
+      "scenario_type": "irrelevant_question",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "电脑风扇噪音大怎么办",
+          "expectation": {
+            "required_terms_any": [
+              "不是",
+              "不清楚",
+              "可以",
+              "如果你愿意"
+            ],
+            "response_policy": "polite_fallback"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "irrelevant-6",
+      "scenario_type": "irrelevant_question",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "书桌划痕怎么修复",
+          "expectation": {
+            "required_terms_any": [
+              "不是",
+              "不清楚",
+              "可以",
+              "如果你愿意"
+            ],
+            "response_policy": "polite_fallback"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "irrelevant-7",
+      "scenario_type": "irrelevant_question",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "怎么给绿植换盆",
+          "expectation": {
+            "required_terms_any": [
+              "不是",
+              "不清楚",
+              "可以",
+              "如果你愿意"
+            ],
+            "response_policy": "polite_fallback"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "irrelevant-8",
+      "scenario_type": "irrelevant_question",
+      "evaluation_mode": "fallback",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "窗帘发霉怎么处理",
+          "expectation": {
+            "required_terms_any": [
+              "不是",
+              "不清楚",
+              "可以",
+              "如果你愿意"
+            ],
+            "response_policy": "polite_fallback"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "boundary-1",
+      "scenario_type": "boundary_mixed_intent",
+      "evaluation_mode": "boundary",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "麻婆豆腐和红烧鲤鱼是一个菜吗",
+          "expectation": {
+            "required_terms_any": [
+              "不能",
+              "需要确认",
+              "可以",
+              "推荐",
+              "不知道"
+            ],
+            "response_policy": "polite_fallback"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "boundary-2",
+      "scenario_type": "boundary_mixed_intent",
+      "evaluation_mode": "boundary",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "鸡蛋三明治需要牛排吗",
+          "expectation": {
+            "required_terms_any": [
+              "不能",
+              "需要确认",
+              "可以",
+              "推荐",
+              "不知道"
+            ],
+            "response_policy": "polite_fallback"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "boundary-3",
+      "scenario_type": "boundary_mixed_intent",
+      "evaluation_mode": "boundary",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "给我红烧鲤鱼的奶茶做法",
+          "expectation": {
+            "required_terms_any": [
+              "不能",
+              "需要确认",
+              "可以",
+              "推荐",
+              "不知道"
+            ],
+            "response_policy": "polite_fallback"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "boundary-4",
+      "scenario_type": "boundary_mixed_intent",
+      "evaluation_mode": "boundary",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "昨天吃什么，顺便来个鱼香肉丝",
+          "expectation": {
+            "required_terms_any": [
+              "不能",
+              "需要确认",
+              "可以",
+              "推荐",
+              "不知道"
+            ],
+            "response_policy": "polite_fallback"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "boundary-5",
+      "scenario_type": "boundary_mixed_intent",
+      "evaluation_mode": "boundary",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "红烧鲤鱼的做法和长岛冰茶一起说",
+          "expectation": {
+            "required_terms_any": [
+              "不能",
+              "需要确认",
+              "可以",
+              "推荐",
+              "不知道"
+            ],
+            "response_policy": "polite_fallback"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "boundary-6",
+      "scenario_type": "boundary_mixed_intent",
+      "evaluation_mode": "boundary",
+      "source_dishes": [],
+      "turns": [
+        {
+          "user": "推荐个早餐，再告诉我怎么修玻璃",
+          "expectation": {
+            "required_terms_any": [
+              "不能",
+              "需要确认",
+              "可以",
+              "推荐",
+              "不知道"
+            ],
+            "response_policy": "polite_fallback"
+          }
+        }
+      ]
+    }
+  ]
+}
