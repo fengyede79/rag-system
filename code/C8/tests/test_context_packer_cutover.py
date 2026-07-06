@@ -25,7 +25,7 @@ def _arg_names(function_name: str) -> list[str]:
 
 
 def test_ask_question_builds_context_pack_before_generation_helpers():
-    source = _function_source("ask_question")
+    source = _function_source("_ask_question_once")
 
     parent_index = source.index("parent_docs = self.data_module.get_parent_documents(")
     pack_index = source.index("context_pack = self.context_packer.build_context_pack(")
@@ -92,7 +92,7 @@ def test_generation_helpers_have_no_dead_parameters():
 
 
 def test_ask_question_records_context_pack_trace_only_on_execution_result():
-    source = _function_source("ask_question")
+    source = _function_source("_ask_question_once")
 
     assert "query_plan[\"context_pack_trace\"]" not in source
     assert "query_plan[\"answer_mode\"]" not in source
