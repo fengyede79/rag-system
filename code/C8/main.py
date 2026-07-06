@@ -197,7 +197,7 @@ class RecipeRAGSystem:
         runtime = execution_result.get("runtime", {}) if execution_result else {}
         expected_state_version = runtime.get("read_state_version")
         lifecycle = runtime.get("lifecycle")
-        return conversation_manager.writeback_turn_state(
+        commit_result = conversation_manager.writeback_turn_state(
             session_id=session_id,
             question=question,
             turn_info=turn_info,
@@ -208,6 +208,9 @@ class RecipeRAGSystem:
             expected_state_version=expected_state_version,
             lifecycle=lifecycle,
         )
+        if execution_result is not None and commit_result is not None:
+            execution_result["commit_result"] = commit_result
+        return commit_result
 
     def _apply_resolved_target_to_query_plan(
         self,
@@ -1021,6 +1024,7 @@ class RecipeRAGSystem:
             execution_result["answer_mode"] = context_pack["answer_mode"]
             execution_result["retrieval_quality"] = retrieval_result["quality"]
             execution_result["retrieval_trace"] = retrieval_result["trace"]
+            execution_result["retrieval_query_plan"] = retrieval_query_plan
         else:
             answer = self._generate_detail_response(
                 rewritten_question,
@@ -1042,6 +1046,7 @@ class RecipeRAGSystem:
             execution_result["answer_mode"] = context_pack["answer_mode"]
             execution_result["retrieval_quality"] = retrieval_result["quality"]
             execution_result["retrieval_trace"] = retrieval_result["trace"]
+            execution_result["retrieval_query_plan"] = retrieval_query_plan
 
         # Attach runtime payload to execution_result before writeback
         execution_result["runtime"] = self._runtime_payload(runtime_ctx)
