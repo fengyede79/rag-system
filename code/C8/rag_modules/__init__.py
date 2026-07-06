@@ -6,7 +6,6 @@ from .conversation_manager import ConversationManager
 from .hybrid_router import HybridRouter
 
 # --- 子模块（细粒度工具函数） ---
-from . import guardrail
 from . import structured_generation
 from . import stream_handler
 from . import prompts
@@ -21,7 +20,6 @@ __all__ = [
     'ConversationManager',
     'HybridRouter',
     # 子模块
-    'guardrail',
     'structured_generation',
     'stream_handler',
     'prompts',

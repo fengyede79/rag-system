@@ -61,6 +61,13 @@ def test_state_writeback_uses_policy_and_expected_version():
 
 def test_legacy_convenience_search_helpers_are_not_left_as_independent_runtime_paths():
     source = _source()
+    package_source = (ROOT / "rag_modules" / "__init__.py").read_text(encoding="utf-8")
+    generation_source = (ROOT / "rag_modules" / "generation_integration.py").read_text(encoding="utf-8")
 
     assert "def search_by_category" not in source
     assert "def get_ingredients_list" not in source
+    assert "def _maybe_handle_guardrail_query" not in source
+    assert "guardrail" not in package_source
+    assert "_classify_query_guardrail" not in generation_source
+    assert "build_guardrail_answer" not in generation_source
+    assert not (ROOT / "rag_modules" / "guardrail.py").exists()

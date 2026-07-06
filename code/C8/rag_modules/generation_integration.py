@@ -15,7 +15,6 @@ from langchain_core.documents import Document
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 
-from . import guardrail as _guardrail_module
 from . import structured_generation as _structured_generation
 from . import stream_handler as _stream_handler
 from .prompts import (
@@ -163,14 +162,6 @@ class GenerationIntegrationModule:
             logger.warning(f"[ConsistencyCheck] 查询菜品'{query_dish}'与文档菜品{list(doc_dishes)}不匹配，拦截生成")
             return f"抱歉，知识库中未找到「{query_dish}」的相关食谱信息。当前检索到的内容属于 {list(doc_dishes)[0]}，请您确认菜品名称或尝试其他问法。"
         return None
-
-    def _classify_query_guardrail(self, query: str) -> Optional[str]:
-        """识别应在检索前直接保守兜底的问题（委托到 guardrail）。"""
-        return _guardrail_module.classify_query_guardrail(query)
-
-    def build_guardrail_answer(self, query: str, reason: str) -> str:
-        """统一生成边界问题的保守回答（委托到 guardrail）。"""
-        return _guardrail_module.build_guardrail_answer(query, reason)
 
     def generate_smalltalk_answer(self, query: str) -> str:
         """为闲聊轮次生成直接回复，不进入检索。"""

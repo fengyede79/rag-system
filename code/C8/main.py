@@ -489,22 +489,6 @@ class RecipeRAGSystem:
         print(f"使用新框架确定的查询文本: {question}")
         return question
 
-    def _maybe_handle_guardrail_query(self, question: str):
-        """对超出知识库边界的问题直接给出保守回答。"""
-        reason = self.generation_module._classify_query_guardrail(question)
-        if not reason:
-            return None
-
-        print(f"触发边界护栏: {reason}")
-        answer = self.generation_module.build_guardrail_answer(question, reason)
-        self._latest_parent_docs = []
-        self.generation_module._record_generation_trace(
-            f"guardrail_{reason}",
-            context_doc_count=0,
-            reason=reason,
-        )
-        return answer
-
     def _print_relevant_chunk_summary(self, relevant_chunks):
         """打印检索到的文档块摘要。"""
         if not relevant_chunks:

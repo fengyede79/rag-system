@@ -98,9 +98,6 @@ class _StubGenerationModule(GenerationIntegrationModule):
     def get_current_entity(self, session_id):
         return self.conversation_manager.get_current_entity(session_id)
 
-    def _classify_query_guardrail(self, query):
-        return None
-
     def query_rewrite(self, query):
         return query
 
