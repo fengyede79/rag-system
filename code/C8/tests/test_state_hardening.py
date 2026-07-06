@@ -192,3 +192,63 @@ def test_conversation_manager_is_safe_under_parallel_access():
         futures = [executor.submit(worker, i) for i in range(40)]
         for future in futures:
             future.result()
+
+
+def test_session_state_version_starts_at_zero_and_increments_on_commit():
+    manager = ConversationManager()
+
+    assert manager.get_state_version("version-session") == 0
+    result = manager.commit_state_diff(
+        "version-session",
+        {
+            "answer_type": "smalltalk",
+            "updates": {"last_answer_type": "smalltalk"},
+            "clear": [],
+            "append_history": False,
+            "history": None,
+        },
+        expected_version=0,
+    )
+
+    assert result["committed"] is True
+    assert result["state_version_before"] == 0
+    assert result["state_version_after"] == 1
+    assert manager.get_state_version("version-session") == 1
+
+
+def test_commit_state_diff_rejects_mismatched_expected_version_without_mutation():
+    manager = ConversationManager()
+    manager.commit_state_diff(
+        "conflict-session",
+        {
+            "answer_type": "smalltalk",
+            "updates": {"last_answer_type": "smalltalk"},
+            "clear": [],
+            "append_history": False,
+            "history": None,
+        },
+        expected_version=0,
+    )
+
+    result = manager.commit_state_diff(
+        "conflict-session",
+        {
+            "answer_type": "detail",
+            "updates": {
+                "last_answer_type": "detail",
+                "current_dish": {"value": "蛋炒饭", "source": "test", "confidence": 1.0},
+            },
+            "clear": [],
+            "append_history": False,
+            "history": None,
+        },
+        expected_version=0,
+    )
+
+    session = manager.get_session("conflict-session")
+    assert result["committed"] is False
+    assert result["reason"] == "state_version_mismatch"
+    assert result["current_version"] == 1
+    assert session.current_entity is None
+    assert session.last_answer_type == "smalltalk"
+    assert manager.get_state_version("conflict-session") == 1

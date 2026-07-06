@@ -41,6 +41,8 @@ class SessionState:
     current_entity_meta: Dict[str, Any] = field(default_factory=dict)
     pending_clarification: Optional[Dict[str, Any]] = None
     last_answer_type: Optional[str] = None
+    state_version: int = 0
+    turn_lifecycle: Dict[str, Any] = field(default_factory=dict)
 
 
 class ConversationManager:
@@ -284,6 +286,70 @@ class ConversationManager:
                 intent_type=history.get("intent_type", state_diff.get("answer_type", "general")),
                 entities=history.get("entities", {}),
             )
+
+    def get_state_version(self, session_id: str) -> int:
+        with self._lock:
+            return self.get_session(session_id).state_version
+
+    def check_state_version(self, session_id: str, expected_version: int) -> dict[str, Any]:
+        with self._lock:
+            current = self.get_session(session_id).state_version
+            if current == expected_version:
+                return {
+                    "matched": True,
+                    "expected_version": expected_version,
+                    "current_version": current,
+                    "reason": "state_version_match",
+                }
+            return {
+                "matched": False,
+                "expected_version": expected_version,
+                "current_version": current,
+                "reason": "state_version_mismatch",
+            }
+
+    def _record_turn_lifecycle(
+        self,
+        session: SessionState,
+        turn_id: str,
+        lifecycle: dict[str, Any],
+    ) -> None:
+        session.turn_lifecycle[turn_id] = dict(lifecycle)
+        while len(session.turn_lifecycle) > 20:
+            oldest_turn_id = next(iter(session.turn_lifecycle))
+            session.turn_lifecycle.pop(oldest_turn_id, None)
+
+    def commit_state_diff(
+        self,
+        session_id: str,
+        state_diff: dict[str, Any],
+        *,
+        expected_version: int,
+        lifecycle: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        with self._lock:
+            session = self.get_session(session_id)
+            before = session.state_version
+            if before != expected_version:
+                return {
+                    "committed": False,
+                    "reason": "state_version_mismatch",
+                    "expected_version": expected_version,
+                    "current_version": before,
+                }
+            self.apply_state_diff(session_id, state_diff)
+            if lifecycle is not None:
+                self._record_turn_lifecycle(
+                    session,
+                    state_diff.get("turn_id", "last_turn"),
+                    lifecycle,
+                )
+            session.state_version += 1
+            return {
+                "committed": True,
+                "state_version_before": before,
+                "state_version_after": session.state_version,
+            }
 
     def writeback_turn_state(
         self,
