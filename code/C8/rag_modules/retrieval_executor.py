@@ -40,9 +40,9 @@ def _answer_mode_hint(execution_plan: dict, base_query_plan: dict) -> str:
 
 
 def _fallback_policy(route_type: str, hard_filters: list[str], filters: dict) -> str:
-    if "dish_name" in hard_filters:
-        return "disabled"
-    if route_type == "list" or any(key in filters for key in SOFT_FILTER_KEYS):
+    droppable_keys = set(SOFT_FILTER_KEYS) | {"content_type"}
+    has_droppable = any(key in filters for key in droppable_keys)
+    if has_droppable or route_type == "list":
         return "relaxed_filters"
     return "disabled"
 
@@ -254,8 +254,6 @@ class RetrievalExecutor:
             return []
 
         hard_filters = set(query_plan.get("hard_filters") or [])
-        if policy == "broad_search" and "dish_name" in hard_filters:
-            return []
 
         if policy == "relaxed_filters":
             relaxed_filters = self._relaxed_filters(query_plan)
@@ -272,6 +270,8 @@ class RetrievalExecutor:
             return self._mark_fallback(chunks)
 
         if policy == "broad_search":
+            if "dish_name" in hard_filters:
+                return []
             chunks = list(
                 self.retrieval_module.hybrid_search(
                     query_plan["query"],
@@ -286,7 +286,8 @@ class RetrievalExecutor:
     def _relaxed_filters(self, query_plan: dict) -> dict:
         filters = dict(query_plan.get("filters") or {})
         hard_filters = set(query_plan.get("hard_filters") or [])
-        return {key: value for key, value in filters.items() if key in hard_filters}
+        droppable_keys = set(SOFT_FILTER_KEYS) | {"content_type"}
+        return {key: value for key, value in filters.items() if key in hard_filters or key not in droppable_keys}
 
     def _mark_fallback(self, chunks: list[Document]) -> list[Document]:
         for chunk in chunks:

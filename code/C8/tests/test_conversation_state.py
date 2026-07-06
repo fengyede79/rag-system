@@ -332,7 +332,7 @@ def test_no_result_turn_does_not_replace_current_entity():
 
     answer = system.ask_question("西湖醋鱼怎么样？", stream=False, session_id="no-result-session")
 
-    assert "没有找到相关的食谱信息" in answer
+    assert "没有找到" in answer
     assert manager.get_current_entity("no-result-session") == "蛋炒饭"
 
 
@@ -973,20 +973,46 @@ def test_context_first_pipeline_does_not_block_ordinal_followup_before_snapshot(
         def generate_smalltalk_answer(self, question):
             return "smalltalk"
 
-    system.retrieval_module = object()
+    from langchain_core.documents import Document
+
+    class FakeRetrievalModule:
+        def extract_filters_from_query(self, query):
+            return {}
+
+    doc = Document(page_content="鸡胸肉沙拉做法", metadata={"dish_name": "鸡胸肉沙拉"})
+
+    class FakeExecutor:
+        def execute(self, query_plan):
+            return {
+                "chunks": [doc],
+                "quality": {
+                    "enough_evidence": True,
+                    "quality_reason": "exact_dish_matched",
+                    "fallback_used": False,
+                    "relaxed_filter": False,
+                    "candidate_count": 1,
+                    "selected_dishes": ["鸡胸肉沙拉"],
+                },
+                "low_evidence": None,
+                "trace": {"strategy": "primary"},
+            }
+
+    system.retrieval_module = FakeRetrievalModule()
+    system.retrieval_executor = FakeExecutor()
     system.generation_module = FakeGeneration()
+    system.config = type("Config", (), {"top_k": 3})()
     system._latest_parent_docs = []
     system.last_execution_result = None
 
     monkeypatch.setattr(system, "_build_query_plan", lambda question, session_id: {"route_type": "detail", "dish_name": "鸡胸肉沙拉", "filters": {}, "entities": []})
     monkeypatch.setattr(system, "_apply_resolved_target_to_query_plan", lambda query_plan, resolution: query_plan)
-    monkeypatch.setattr(system, "_search_relevant_chunks", lambda question, rewritten_query, filters, dish_name, top_k=5, query_dish=None: [{"content": "鸡胸肉沙拉做法", "metadata": {"dish_name": "鸡胸肉沙拉"}}])
     monkeypatch.setattr(system, "_print_relevant_chunk_summary", lambda chunks: None)
     monkeypatch.setattr(system, "_rewrite_question_for_search", lambda question, route_type: question)
     monkeypatch.setattr(system, "_generate_detail_response", lambda question, stream, session_id, route_type, filters, entities, dish_name, relevant_chunks: "鸡胸肉沙拉适合减脂。")
     monkeypatch.setattr(system, "_write_conversation_turn", lambda **kwargs: calls.append(kwargs))
     monkeypatch.setattr("main.resolve_reference_from_snapshot", lambda snapshot, llm: None)
     monkeypatch.setattr("main.guard_resolution_output", lambda resolution, constraints: resolution)
+    monkeypatch.setattr("main.build_retrieval_query_plan", lambda **kwargs: kwargs)
 
     answer = system.ask_question("第一个适合减脂吗", stream=False, session_id="ctx-first")
 
@@ -1074,3 +1100,126 @@ def test_context_first_pipeline_routes_smalltalk_without_recipe_state_update(mon
     assert answer == "不客气。"
     assert calls[-1]["turn_info"]["action"] == "smalltalk"
     assert calls[-1]["turn_info"]["should_update_entity_state"] is False
+
+
+def test_chat_path_uses_retrieval_executor_result(monkeypatch):
+    from main import RecipeRAGSystem
+    from langchain_core.documents import Document
+
+    system = RecipeRAGSystem.__new__(RecipeRAGSystem)
+    calls = []
+    doc = Document(page_content="蛋炒饭步骤", metadata={"dish_name": "蛋炒饭", "content_type": "steps"})
+
+    class FakeGeneration:
+        conversation_manager = None
+
+        def query_router(self, question):
+            return {
+                "type": "detail",
+                "filters": {"content_type": "steps"},
+                "dish_name": "蛋炒饭",
+                "confidence": 1.0,
+            }
+
+    class FakeExecutor:
+        def execute(self, query_plan):
+            calls.append(query_plan)
+            return {
+                "chunks": [doc],
+                "quality": {
+                    "enough_evidence": True,
+                    "quality_reason": "exact_dish_matched",
+                    "fallback_used": False,
+                    "relaxed_filter": False,
+                    "candidate_count": 1,
+                    "selected_dishes": ["蛋炒饭"],
+                },
+                "low_evidence": None,
+                "trace": {"strategy": "primary"},
+            }
+
+    class FakeRetrievalModule:
+        def extract_filters_from_query(self, query):
+            return {}
+
+    system.retrieval_module = FakeRetrievalModule()
+    system.retrieval_executor = FakeExecutor()
+    system.generation_module = FakeGeneration()
+    system.config = type("Config", (), {"top_k": 3})()
+    system._latest_parent_docs = []
+    system.last_execution_result = None
+
+    monkeypatch.setattr(system, "_apply_resolved_target_to_query_plan", lambda query_plan, resolution: query_plan)
+    monkeypatch.setattr(system, "_generate_detail_response", lambda *args, **kwargs: "蛋炒饭做法")
+    monkeypatch.setattr(system, "_write_conversation_turn", lambda **kwargs: None)
+
+    answer = system.ask_question("蛋炒饭怎么做", stream=False, session_id="executor-chat")
+
+    assert answer == "蛋炒饭做法"
+    assert calls
+    assert calls[0]["query"] == "蛋炒饭怎么做"
+    assert calls[0]["dish_name"] == "蛋炒饭"
+    assert calls[0]["filters"]["content_type"] == "steps"
+
+
+def test_chat_path_returns_low_evidence_without_generation(monkeypatch):
+    from main import RecipeRAGSystem
+
+    system = RecipeRAGSystem.__new__(RecipeRAGSystem)
+    writes = []
+    generation_calls = []
+
+    class FakeGeneration:
+        conversation_manager = None
+
+        def query_router(self, question):
+            return {
+                "type": "detail",
+                "filters": {},
+                "dish_name": "西湖醋鱼",
+                "confidence": 1.0,
+            }
+
+    class FakeExecutor:
+        def execute(self, query_plan):
+            return {
+                "chunks": [],
+                "quality": {
+                    "enough_evidence": False,
+                    "quality_reason": "exact_dish_not_found",
+                    "fallback_used": False,
+                    "relaxed_filter": False,
+                    "candidate_count": 0,
+                    "selected_dishes": [],
+                },
+                "low_evidence": {
+                    "answer_type": "no_result",
+                    "answer": "知识库里没有找到这道菜的可靠做法。",
+                    "state_diff_policy": "low_evidence",
+                    "quality_reason": "exact_dish_not_found",
+                },
+                "trace": {"strategy": "low_evidence"},
+            }
+
+    class FakeRetrievalModule:
+        def extract_filters_from_query(self, query):
+            return {}
+
+    system.retrieval_module = FakeRetrievalModule()
+    system.retrieval_executor = FakeExecutor()
+    system.generation_module = FakeGeneration()
+    system.config = type("Config", (), {"top_k": 3})()
+    system._latest_parent_docs = []
+    system.last_execution_result = None
+
+    monkeypatch.setattr(system, "_apply_resolved_target_to_query_plan", lambda query_plan, resolution: query_plan)
+    monkeypatch.setattr(system, "_generate_detail_response", lambda *args, **kwargs: generation_calls.append(args) or "should not happen")
+    monkeypatch.setattr(system, "_write_conversation_turn", lambda **kwargs: writes.append(kwargs))
+
+    answer = system.ask_question("西湖醋鱼怎么做", stream=False, session_id="low-evidence-chat")
+
+    assert answer == "知识库里没有找到这道菜的可靠做法。"
+    assert generation_calls == []
+    assert writes[-1]["execution_result"]["answer_type"] == "no_result"
+    assert writes[-1]["execution_result"]["state_diff_policy"] == "low_evidence"
+    assert writes[-1]["execution_result"]["retrieval_quality"]["quality_reason"] == "exact_dish_not_found"

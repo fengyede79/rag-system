@@ -106,7 +106,7 @@ def test_query_plan_normalization_prefers_resolved_target_as_hard_dish_filter():
     assert result["filters"]["content_type"] == "steps"
     assert result["hard_filters"] == ["dish_name"]
     assert "content_type" in result["soft_filters"]
-    assert result["fallback_policy"] == "disabled"
+    assert result["fallback_policy"] == "relaxed_filters"
     assert result["top_k"] == 3
 
 

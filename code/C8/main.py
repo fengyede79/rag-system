@@ -33,6 +33,7 @@ from rag_modules.reference_resolution import (
     rewrite_query_for_execution,
 )
 from rag_modules.execution_planner import build_execution_plan
+from rag_modules.retrieval_executor import RetrievalExecutor, build_retrieval_query_plan
 
 # 配置日志
 logging.basicConfig(
@@ -615,6 +616,7 @@ class RecipeRAGSystem:
 
         print("初始化检索优化...")
         self.retrieval_module = RetrievalOptimizationModule(vectorstore, chunks)
+        self.retrieval_executor = RetrievalExecutor(self.retrieval_module)
         self._print_knowledge_base_stats()
         print("知识库构建完成！")
     
@@ -639,6 +641,9 @@ class RecipeRAGSystem:
         """
         if not all([self.retrieval_module, self.generation_module]):
             raise ValueError("请先构建知识库")
+
+        if not hasattr(self, "retrieval_executor") or self.retrieval_executor is None:
+            self.retrieval_executor = RetrievalExecutor(self.retrieval_module)
 
         print(f"\n用户问题: {question}")
         original_question = question
@@ -808,17 +813,32 @@ class RecipeRAGSystem:
         dish_name = query_plan["dish_name"]
         entities = query_plan["entities"]
         rewritten_query = self._rewrite_question_for_search(rewritten_question, route_type)
-        relevant_chunks = self._search_relevant_chunks(
-            rewritten_question,
-            rewritten_query,
-            filters,
-            dish_name,
+
+        # Preserve legacy query-text filter extraction (category, difficulty, ingredient)
+        extracted_filters = self.retrieval_module.extract_filters_from_query(question)
+        for key, value in extracted_filters.items():
+            if key not in query_plan["filters"]:
+                query_plan["filters"][key] = value
+
+        retrieval_query_plan = build_retrieval_query_plan(
+            original_query=question,
+            rewritten_query=rewritten_query,
+            base_query_plan=query_plan,
+            execution_plan=execution_plan,
+            resolution=resolution,
+            preference_constraints=preference_constraints,
+            top_k=self.config.top_k,
         )
+        retrieval_result = self.retrieval_executor.execute(retrieval_query_plan)
+        query_plan["retrieval_query_plan"] = retrieval_query_plan
+        query_plan["retrieval_quality"] = retrieval_result["quality"]
+        query_plan["retrieval_trace"] = retrieval_result["trace"]
+        relevant_chunks = retrieval_result["chunks"]
         self._print_relevant_chunk_summary(relevant_chunks)
 
-        if not relevant_chunks:
-            logger.info("检索结果为空: question=%s session_id=%s entities=%s", rewritten_question, session_id, entities)
-            answer = "抱歉，没有找到相关的食谱信息。请尝试其他菜品名称或关键词。"
+        if retrieval_result["low_evidence"]:
+            low = retrieval_result["low_evidence"]
+            answer = low["answer"]
             execution_result = self._build_execution_result(
                 success=False,
                 answer=answer,
@@ -828,6 +848,10 @@ class RecipeRAGSystem:
                 resolution=resolution,
                 parent_docs=[],
             )
+            execution_result["answer_type"] = low["answer_type"]
+            execution_result["state_diff_policy"] = low["state_diff_policy"]
+            execution_result["retrieval_quality"] = retrieval_result["quality"]
+            execution_result["retrieval_trace"] = retrieval_result["trace"]
             self.last_execution_result = execution_result
             self._write_conversation_turn(
                 session_id=session_id,
@@ -847,10 +871,9 @@ class RecipeRAGSystem:
                     answer=answer,
                     expectation=expectation or {},
                     generation_trace={
-                        "strategy": "no_retrieval_result",
-                        "content_type": filters.get("content_type"),
-                        "context_doc_count": 0,
-                        "reason": "no_relevant_chunks",
+                        "strategy": "low_evidence",
+                        "retrieval_quality": retrieval_result["quality"],
+                        "retrieval_trace": retrieval_result["trace"],
                     },
                 )
                 return {"answer": answer, "diagnostics": self.last_query_diagnostics}
@@ -869,6 +892,8 @@ class RecipeRAGSystem:
                 parent_docs=list(self._latest_parent_docs),
                 recommended_dishes=recommended_dishes,
             )
+            execution_result["retrieval_quality"] = retrieval_result["quality"]
+            execution_result["retrieval_trace"] = retrieval_result["trace"]
         else:
             answer = self._generate_detail_response(
                 rewritten_question,
@@ -889,6 +914,8 @@ class RecipeRAGSystem:
                 resolution=resolution,
                 parent_docs=list(self._latest_parent_docs),
             )
+            execution_result["retrieval_quality"] = retrieval_result["quality"]
+            execution_result["retrieval_trace"] = retrieval_result["trace"]
         self.last_execution_result = execution_result
 
         # For stream mode, wrap generator to defer writeback until consumption
