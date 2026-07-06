@@ -276,15 +276,17 @@ def ask_and_trace(system: RecipeRAGSystem, question: str, *, session_id: str, st
     if stream:
         answer = "".join(list(answer))
     result = dict(system.last_execution_result or {})
-    query_plan = {
-        "route_type": result.get("route_type"),
-        "filters": result.get("filters", {}),
-        "dish_name": result.get("dish_name"),
-    }
-    if result.get("retrieval_query_plan"):
-        query_plan["retrieval_query_plan"] = result["retrieval_query_plan"]
-    if result.get("retrieval_quality") and "retrieval_quality" not in query_plan:
-        query_plan["retrieval_quality"] = result["retrieval_quality"]
+    query_plan = {}
+    if result.get("route_type"):
+        query_plan = {
+            "route_type": result["route_type"],
+            "filters": result.get("filters", {}),
+            "dish_name": result.get("dish_name"),
+        }
+        if result.get("retrieval_query_plan"):
+            query_plan["retrieval_query_plan"] = result["retrieval_query_plan"]
+        if result.get("retrieval_quality"):
+            query_plan["retrieval_quality"] = result["retrieval_quality"]
     trace = {
         "query_plan": query_plan,
         "retrieval_quality": result.get("retrieval_quality") or {},

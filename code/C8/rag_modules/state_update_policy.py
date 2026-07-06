@@ -28,14 +28,15 @@ def classify_answer_type(
 ) -> str:
     """Classify answer_type directly from Stage 01 execution facts."""
     turn_type = turn_info.get("turn_type", "domain_query")
+    action = turn_info.get("action", "")
 
     if execution_result.get("stream_interrupted"):
         return "stream_aborted"
     if execution_result.get("success") is False:
         return "no_result"
-    if turn_type in {"front_door_blocked", "out_of_domain"}:
+    if turn_type in {"front_door_blocked", "out_of_domain"} or action == "domain_reject":
         return "domain_reject"
-    if turn_type in {"smalltalk", "front_door_direct_reply"}:
+    if action == "smalltalk" or turn_type in {"smalltalk", "front_door_direct_reply"}:
         return "smalltalk"
     if resolution and resolution.get("next_action") == "ask_clarification":
         return "clarification"
