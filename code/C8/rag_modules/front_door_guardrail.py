@@ -1,7 +1,7 @@
 """Basic safety gate for the context-first turn pipeline.
 
 This module only decides whether a query is structurally safe enough to enter
-the context-aware runtime. It does not classify domain, smalltalk, recipes,
+the context-aware runtime. It does not classify domain, recipes,
 references, dishes, filters, routes, answer modes, or rewritten queries.
 """
 
