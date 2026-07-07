@@ -366,6 +366,47 @@ class RecipeRAGSystem:
                 fallback.append(cleaned)
         return fallback[:5]
 
+    def _parent_expansion_target(self, *, route_type: str, dish_name: str | None, retrieval_result: dict) -> str | None:
+        """选择父文档回溯目标，避免 alias fallback 被原始菜名二次过滤掉。"""
+        if route_type == "list" or not dish_name:
+            return None
+        trace = retrieval_result.get("trace") or {}
+        alias = trace.get("dish_alias_used")
+        if alias:
+            return alias
+        return dish_name
+
+    def _strip_question_echo(self, answer: str, question: str) -> str:
+        """移除生成答案中对用户原问题的机械复述。"""
+        if not answer or not question:
+            return answer
+        normalized_question = question.strip().rstrip("?!？！。")
+        if not normalized_question:
+            return answer
+
+        cleaned = answer
+        variants = {
+            question.strip(),
+            normalized_question,
+            f"“{question.strip()}”",
+            f"“{normalized_question}”",
+            f"\"{question.strip()}\"",
+            f"\"{normalized_question}\"",
+        }
+        for variant in sorted(variants, key=len, reverse=True):
+            if variant:
+                cleaned = cleaned.replace(variant, "")
+
+        cleanup_patterns = (
+            "总结回答您的问题：",
+            "总结回答您的问题:",
+            "回答您的问题：",
+            "回答您的问题:",
+        )
+        for pattern in cleanup_patterns:
+            cleaned = cleaned.replace(pattern, "")
+        return cleaned
+
     def _is_invalid_reference_dish_name(self, dish_name: str | None) -> bool:
         """检测伪菜名：序号引用短语或追问片段不应被当作菜品名。"""
         if not dish_name:
@@ -960,16 +1001,13 @@ class RecipeRAGSystem:
             return answer
 
         # --- Build context pack before generation ---
-        # When alias fallback resolved a different dish name, use that as the
-        # parent-expansion target so we fetch the correct parent document.
-        parent_target = dish_name
-        alias_used = retrieval_result.get("trace", {}).get("dish_alias_used")
-        if alias_used:
-            parent_target = alias_used
-
         parent_docs = self.data_module.get_parent_documents(
             relevant_chunks,
-            target_dish_name=parent_target if route_type != "list" else None,
+            target_dish_name=self._parent_expansion_target(
+                route_type=route_type,
+                dish_name=dish_name,
+                retrieval_result=retrieval_result,
+            ),
         )
         context_pack = self.context_packer.build_context_pack(
             query=rewritten_question,
@@ -1038,6 +1076,10 @@ class RecipeRAGSystem:
             execution_result["retrieval_quality"] = retrieval_result["quality"]
             execution_result["retrieval_trace"] = retrieval_result["trace"]
             execution_result["retrieval_query_plan"] = retrieval_query_plan
+
+        if isinstance(answer, str):
+            answer = self._strip_question_echo(answer, question)
+            execution_result["answer"] = answer
 
         # Attach runtime payload to execution_result before writeback
         execution_result["runtime"] = self._runtime_payload(runtime_ctx)

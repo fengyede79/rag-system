@@ -122,6 +122,25 @@ def _has_explicit_dish_before_detail_keyword(question: str) -> bool:
     return all("\u4e00" <= ch <= "\u9fff" for ch in candidate)
 
 
+def _is_pronoun_constraint_followup(query: str) -> bool:
+    text = _strip_question_punctuation(query)
+    if not text.startswith(("它", "这个", "那个", "这道", "这道菜", "那道", "那道菜")):
+        return False
+    constraint_signals = (
+        "适合带饭",
+        "适合新手",
+        "热量",
+        "减脂",
+        "不辣",
+        "不放",
+        "不要",
+        "少油",
+        "少盐",
+        "少糖",
+    )
+    return any(signal in text for signal in constraint_signals)
+
+
 # ---------------------------------------------------------------------------
 # Core resolution
 # ---------------------------------------------------------------------------
@@ -182,16 +201,30 @@ def resolve_reference_from_snapshot(snapshot: dict, llm) -> dict:
             decision_basis="explicit",
         )
 
-    # 4. Pronoun in recommendation list → ambiguous
+    # 4. Pronoun constraint followup can safely use a confirmed current dish.
+    current_dish = snapshot["reference_state"].get("current_dish") or {}
+    if (
+        snapshot["topic_state"].get("mode") == "recommendation_list"
+        and _is_pronoun_constraint_followup(query)
+        and current_dish.get("active")
+        and current_dish.get("value")
+    ):
+        return _resolved(
+            current_dish["value"],
+            "implicit_single_dish_followup",
+            "pronoun_constraint_uses_active_current_dish",
+            decision_basis="inferred",
+        )
+
+    # 5. Pronoun in recommendation list → ambiguous
     if snapshot["topic_state"]["mode"] == "recommendation_list" and query.startswith(("它", "这个", "那个")):
         return _clarify(
             "multiple_candidates_in_recommendation_list",
             "你是指第几个推荐菜，还是直接告诉我菜名？",
         )
 
-    # 5. Implicit single-dish followup (e.g. "有什么小技巧别粘锅？")
+    # 6. Implicit single-dish followup (e.g. "有什么小技巧别粘锅？")
     implicit_followup = constraints.get("implicit_followup") or {}
-    current_dish = snapshot["reference_state"].get("current_dish") or {}
     if implicit_followup.get("enabled"):
         if _has_explicit_dish_before_detail_keyword(query):
             # 原问题已有明确菜品，跳过隐式追问解析
@@ -209,7 +242,7 @@ def resolve_reference_from_snapshot(snapshot: dict, llm) -> dict:
                 decision_basis="inferred",
             )
 
-    # 6. Single candidate → resolved
+    # 7. Single candidate → resolved
     if len(candidates) == 1:
         return {
             "resolution_status": "resolved",
@@ -223,7 +256,7 @@ def resolve_reference_from_snapshot(snapshot: dict, llm) -> dict:
             "decision_basis": "inferred",
         }
 
-    # 7. No reference needed
+    # 8. No reference needed
     return {
         "resolution_status": "no_reference_needed",
         "resolved_target": None,

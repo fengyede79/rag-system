@@ -1323,6 +1323,61 @@ def test_chat_path_returns_low_evidence_without_generation(monkeypatch):
     assert writes[-1]["execution_result"]["retrieval_quality"]["quality_reason"] == "exact_dish_not_found"
 
 
+def test_parent_expansion_target_uses_alias_when_alias_fallback_succeeds():
+    from main import RecipeRAGSystem
+
+    system = RecipeRAGSystem.__new__(RecipeRAGSystem)
+    retrieval_result = {
+        "quality": {
+            "selected_dishes": ["西红柿炒鸡蛋"],
+            "fallback_used": True,
+            "relaxed_filter": True,
+        },
+        "trace": {
+            "strategy": "alias_fallback",
+            "dish_alias_used": "西红柿炒鸡蛋",
+        },
+    }
+
+    target = system._parent_expansion_target(
+        route_type="detail",
+        dish_name="番茄炒蛋",
+        retrieval_result=retrieval_result,
+    )
+
+    assert target == "西红柿炒鸡蛋"
+
+
+def test_parent_expansion_target_keeps_original_dish_for_primary_exact_match():
+    from main import RecipeRAGSystem
+
+    system = RecipeRAGSystem.__new__(RecipeRAGSystem)
+    retrieval_result = {
+        "quality": {"selected_dishes": ["蛋炒饭"], "fallback_used": False},
+        "trace": {"strategy": "primary"},
+    }
+
+    target = system._parent_expansion_target(
+        route_type="detail",
+        dish_name="蛋炒饭",
+        retrieval_result=retrieval_result,
+    )
+
+    assert target == "蛋炒饭"
+
+
+def test_strip_question_echo_removes_exact_question_from_generated_answer():
+    from main import RecipeRAGSystem
+
+    system = RecipeRAGSystem.__new__(RecipeRAGSystem)
+    answer = "✅ 总结回答您的问题：“能不能不要辣椒？”\n可以不放辣椒，但风味会更温和。"
+
+    cleaned = system._strip_question_echo(answer, "能不能不要辣椒？")
+
+    assert "能不能不要辣椒" not in cleaned
+    assert "可以不放辣椒" in cleaned
+
+
 def test_chat_path_builds_context_pack_before_detail_generation(monkeypatch):
     from main import RecipeRAGSystem
     from langchain_core.documents import Document

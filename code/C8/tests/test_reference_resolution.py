@@ -43,6 +43,54 @@ def test_ambiguous_recommendation_followup_requires_clarification():
     assert result["writeback_eligible"] is False
 
 
+def test_pronoun_constraint_followup_prefers_active_current_dish_over_recommendation_ambiguity():
+    snapshot = {
+        "topic_state": {"mode": "recommendation_list"},
+        "reference_state": {
+            "current_dish": {
+                "value": "宫保鸡丁",
+                "source": "confirmed",
+                "confidence": 1.0,
+                "updated_at": 3.0,
+                "active": True,
+            },
+            "recent_recommendations": [
+                {"rank": 1, "dish_name": "宫保鸡丁"},
+                {"rank": 2, "dish_name": "鸡胸肉沙拉"},
+            ],
+            "recent_topics": [],
+            "last_confirmed_target": "宫保鸡丁",
+        },
+        "conversation_state": {
+            "last_user_query": "换个不辣的鸡肉菜",
+            "current_user_query": "这个适合带饭吗？",
+        },
+        "resolution_constraints": {
+            "allowed_reference_targets": ["宫保鸡丁", "鸡胸肉沙拉"],
+            "explicit_query_targets": [],
+            "allow_external_explicit_target": False,
+            "allow_default_selection": False,
+            "must_clarify_if_ambiguous": True,
+            "allow_topic_switch_detection": True,
+            "implicit_followup": {"enabled": True, "remaining_query": "适合带饭吗", "requires_single_active_dish": True},
+            "priority_order": [
+                "explicit_query_target",
+                "last_confirmed_target",
+                "ordinal_recommendation_reference",
+                "pronoun_recommendation_reference",
+                "current_dish",
+            ],
+        },
+    }
+
+    result = resolve_reference_from_snapshot(snapshot, llm=None)
+
+    assert result["resolution_status"] == "resolved"
+    assert result["resolved_target"] == "宫保鸡丁"
+    assert result["target_source"] == "implicit_single_dish_followup"
+    assert result["next_action"] == "apply_reference_resolution"
+
+
 def test_explicit_correction_is_not_blocked_by_old_candidates():
     snapshot = {
         "topic_state": {"mode": "single_dish"},
