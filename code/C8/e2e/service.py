@@ -53,7 +53,7 @@ class LiveServiceProcess:
             command,
             cwd=str(self.project_dir),
             env=env,
-            stdout=subprocess.PIPE,
+            stdout=subprocess.DEVNULL,
             stderr=subprocess.STDOUT,
             text=True,
             encoding="utf-8",

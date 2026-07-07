@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from e2e.assertions import RATE_LIMITED, TurnResult, evaluate_assertions
+from e2e.assertions import INFRA_ERROR, RATE_LIMITED, TurnResult, evaluate_assertions
 from e2e.client import LiveE2EClient
 from e2e.rate_limit import RateLimiter
 from e2e.reporting import write_jsonl_report, write_markdown_report
@@ -46,8 +46,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=5058)
     parser.add_argument("--reuse-server", action="store_true")
-    parser.add_argument("--stream-timeout-seconds", type=int, default=180)
-    parser.add_argument("--request-timeout-seconds", type=int, default=120)
+    parser.add_argument("--stream-timeout-seconds", type=int, default=300)
+    parser.add_argument("--request-timeout-seconds", type=int, default=300)
     parser.add_argument("--fail-fast", action="store_true")
     return parser
 
@@ -130,6 +130,8 @@ def run_model(
                 f"{final_result.status} {final_result.latency_ms}ms"
             )
             if args.fail_fast and final_result.status not in {"PASS", "FLAKY"}:
+                break
+            if final_result.status == INFRA_ERROR:
                 break
             if rate_limit_count >= args.stop_model_after_rate_limits:
                 break
