@@ -6,6 +6,8 @@ from typing import Any, Dict, Iterable, List
 
 from langchain_core.documents import Document
 
+from rag_modules.dish_aliases import dish_aliases_for, is_known_alias_target
+
 
 SOFT_FILTER_KEYS = ["ingredient", "taste", "difficulty", "time", "health_preference"]
 
@@ -117,6 +119,30 @@ class RetrievalExecutor:
                 ),
             }
 
+        alias_chunks, alias_used = self._alias_fallback_retrieval(query_plan)
+        if alias_chunks:
+            alias_quality = self._check_quality(
+                query_plan,
+                alias_chunks,
+                fallback_used=True,
+                relaxed_filter=True,
+                allow_alias_match=True,
+            )
+            if alias_quality["enough_evidence"]:
+                return {
+                    "chunks": alias_chunks,
+                    "quality": alias_quality,
+                    "low_evidence": None,
+                    "trace": self._build_trace(
+                        query_plan=query_plan,
+                        strategy="alias_fallback",
+                        primary_count=len(primary_chunks),
+                        fallback_count=len(alias_chunks),
+                        quality=alias_quality,
+                        dish_alias_used=alias_used,
+                    ),
+                }
+
         fallback_chunks = self._fallback_retrieval(query_plan)
         if fallback_chunks:
             fallback_quality = self._check_quality(
@@ -189,6 +215,7 @@ class RetrievalExecutor:
         *,
         fallback_used: bool,
         relaxed_filter: bool,
+        allow_alias_match: bool = False,
     ) -> dict:
         selected_dishes = self._selected_dishes(chunks)
         dish_name = query_plan.get("dish_name")
@@ -199,8 +226,15 @@ class RetrievalExecutor:
 
         if enough and dish_name and "dish_name" in hard_filters:
             if dish_name not in selected_dishes:
-                enough = False
-                reason = "exact_dish_not_found"
+                alias_matches = [
+                    selected for selected in selected_dishes
+                    if allow_alias_match and is_known_alias_target(dish_name, selected)
+                ]
+                if alias_matches and len(selected_dishes) == 1:
+                    reason = "alias_dish_matched"
+                else:
+                    enough = False
+                    reason = "exact_dish_not_found"
             elif len(selected_dishes) > 1:
                 enough = False
                 reason = "conflicting_dishes_for_exact_request"
@@ -232,8 +266,9 @@ class RetrievalExecutor:
         primary_count: int,
         fallback_count: int,
         quality: dict,
+        dish_alias_used: str | None = None,
     ) -> dict:
-        return {
+        trace = {
             "strategy": strategy,
             "fusion_strategy": "delegated",
             "query": query_plan.get("query"),
@@ -246,7 +281,39 @@ class RetrievalExecutor:
             "fallback_count": fallback_count,
             "selected_dishes": list(quality.get("selected_dishes") or []),
             "quality_reason": quality.get("quality_reason"),
+            "fallback_used": quality.get("fallback_used"),
+            "relaxed_filter": quality.get("relaxed_filter"),
         }
+        if dish_alias_used:
+            trace["dish_alias_used"] = dish_alias_used
+        return trace
+
+    def _alias_fallback_retrieval(self, query_plan: dict) -> tuple[list[Document], str | None]:
+        dish_name = query_plan.get("dish_name")
+        if not dish_name or "dish_name" not in set(query_plan.get("hard_filters") or []):
+            return [], None
+
+        aliases = dish_aliases_for(dish_name)
+        if not aliases:
+            return [], None
+
+        base_filters = dict(query_plan.get("filters") or {})
+        top_k = query_plan.get("top_k", 3)
+        for alias in aliases:
+            alias_filters = dict(base_filters)
+            alias_filters["dish_name"] = alias
+            chunks = list(
+                self.retrieval_module.metadata_filtered_search(
+                    query_plan["query"],
+                    alias_filters,
+                    top_k=top_k,
+                    query_dish=alias,
+                )
+            )
+            selected = self._selected_dishes(chunks)
+            if len(selected) == 1 and is_known_alias_target(dish_name, selected[0]):
+                return self._mark_fallback(chunks, dish_alias_used=alias), alias
+        return [], None
 
     def _fallback_retrieval(self, query_plan: dict) -> list[Document]:
         policy = query_plan.get("fallback_policy", "disabled")
@@ -289,8 +356,10 @@ class RetrievalExecutor:
         droppable_keys = set(SOFT_FILTER_KEYS) | {"content_type"}
         return {key: value for key, value in filters.items() if key in hard_filters or key not in droppable_keys}
 
-    def _mark_fallback(self, chunks: list[Document]) -> list[Document]:
+    def _mark_fallback(self, chunks: list[Document], dish_alias_used: str | None = None) -> list[Document]:
         for chunk in chunks:
             chunk.metadata["fallback"] = True
             chunk.metadata["relaxed_filter"] = True
+            if dish_alias_used:
+                chunk.metadata["dish_alias_used"] = dish_alias_used
         return chunks

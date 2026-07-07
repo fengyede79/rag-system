@@ -323,3 +323,99 @@ def test_broad_search_fallback_rejected_for_hard_exact_dish_request():
     assert result["quality"]["fallback_used"] is False
     assert result["low_evidence"]["answer_type"] == "no_result"
     assert all(call[0] != "hybrid_search" for call in retrieval_module.calls)
+
+
+def test_alias_fallback_runs_after_exact_dish_primary_fails():
+    alias_doc = _doc("西红柿炒鸡蛋", "ingredients", "西红柿 鸡蛋")
+    retrieval_module = FakeRetrievalModule(filtered_docs=[])
+
+    def metadata_filtered_search(query, filters, top_k=5, query_dish=None):
+        retrieval_module.calls.append(("metadata_filtered_search", query, dict(filters), top_k, query_dish))
+        if filters.get("dish_name") == "西红柿炒鸡蛋":
+            return [alias_doc]
+        return []
+
+    retrieval_module.metadata_filtered_search = metadata_filtered_search
+    executor = RetrievalExecutor(retrieval_module)
+
+    result = executor.execute(
+        {
+            "query": "番茄炒蛋需要什么食材",
+            "original_query": "番茄炒蛋需要什么食材？",
+            "dish_name": "番茄炒蛋",
+            "filters": {"dish_name": "番茄炒蛋", "content_type": "ingredients"},
+            "top_k": 3,
+            "fallback_policy": "relaxed_filters",
+            "hard_filters": ["dish_name"],
+            "soft_filters": ["content_type"],
+            "answer_mode_hint": "recipe_detail",
+        }
+    )
+
+    assert result["chunks"] == [alias_doc]
+    assert result["low_evidence"] is None
+    assert result["quality"]["enough_evidence"] is True
+    assert result["quality"]["fallback_used"] is True
+    assert result["quality"]["relaxed_filter"] is True
+    assert result["trace"]["strategy"] == "alias_fallback"
+    assert result["trace"]["dish_alias_used"] == "西红柿炒鸡蛋"
+    assert alias_doc.metadata["fallback"] is True
+    assert alias_doc.metadata["relaxed_filter"] is True
+    assert alias_doc.metadata["dish_alias_used"] == "西红柿炒鸡蛋"
+
+
+def test_alias_fallback_does_not_run_when_primary_exact_match_succeeds():
+    exact_doc = _doc("番茄炒蛋", "ingredients", "番茄 鸡蛋")
+    retrieval_module = FakeRetrievalModule(filtered_docs=[exact_doc])
+    executor = RetrievalExecutor(retrieval_module)
+
+    result = executor.execute(
+        {
+            "query": "番茄炒蛋需要什么食材",
+            "original_query": "番茄炒蛋需要什么食材？",
+            "dish_name": "番茄炒蛋",
+            "filters": {"dish_name": "番茄炒蛋", "content_type": "ingredients"},
+            "top_k": 3,
+            "fallback_policy": "relaxed_filters",
+            "hard_filters": ["dish_name"],
+            "soft_filters": ["content_type"],
+            "answer_mode_hint": "recipe_detail",
+        }
+    )
+
+    assert result["chunks"] == [exact_doc]
+    assert result["trace"]["strategy"] == "primary"
+    assert "dish_alias_used" not in result["trace"]
+    assert len([call for call in retrieval_module.calls if call[0] == "metadata_filtered_search"]) == 1
+
+
+def test_alias_fallback_keeps_low_evidence_when_alias_returns_wrong_dish():
+    wrong_doc = _doc("鱼香肉丝", "steps", "鱼香肉丝步骤")
+    retrieval_module = FakeRetrievalModule(filtered_docs=[])
+
+    def metadata_filtered_search(query, filters, top_k=5, query_dish=None):
+        retrieval_module.calls.append(("metadata_filtered_search", query, dict(filters), top_k, query_dish))
+        if filters.get("dish_name") == "五花肉":
+            return [wrong_doc]
+        return []
+
+    retrieval_module.metadata_filtered_search = metadata_filtered_search
+    executor = RetrievalExecutor(retrieval_module)
+
+    result = executor.execute(
+        {
+            "query": "红烧肉怎么做",
+            "original_query": "红烧肉怎么做？",
+            "dish_name": "红烧肉",
+            "filters": {"dish_name": "红烧肉", "content_type": "steps"},
+            "top_k": 3,
+            "fallback_policy": "relaxed_filters",
+            "hard_filters": ["dish_name"],
+            "soft_filters": ["content_type"],
+            "answer_mode_hint": "recipe_detail",
+        }
+    )
+
+    assert result["chunks"] == []
+    assert result["low_evidence"]["answer_type"] == "no_result"
+    assert result["trace"]["strategy"] == "low_evidence"
