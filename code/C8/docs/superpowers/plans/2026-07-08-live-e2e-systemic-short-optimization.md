@@ -432,9 +432,10 @@ Add to `code/C8/tests/test_retrieval_executor.py`:
 ```python
 def test_recommendation_query_uses_controlled_broad_fallback_when_primary_empty():
     fallback_docs = [
-        _doc("番茄炒蛋", "steps", "番茄炒蛋步骤"),
-        _doc("蛋炒饭", "steps", "蛋炒饭步骤"),
-        _doc("土豆丝", "steps", "土豆丝步骤"),
+        _doc("番茄炒蛋", "steps", "番茄炒蛋步骤 简单 新手"),
+        _doc("蛋炒饭", "steps", "蛋炒饭步骤 简单 新手"),
+        _doc("土豆丝", "steps", "土豆丝步骤 家常 新手"),
+        _doc("酸梅汤", "steps", "饮品 甜味"),
     ]
     retrieval_module = FakeRetrievalModule(filtered_docs=[], hybrid_docs=fallback_docs)
     executor = RetrievalExecutor(retrieval_module)
@@ -460,7 +461,35 @@ def test_recommendation_query_uses_controlled_broad_fallback_when_primary_empty(
     assert result["quality"]["identity"] == "relaxed_recommendation"
     assert result["trace"]["strategy"] == "recommendation_fallback"
     assert result["trace"]["relaxed_filter"] is True
-    assert ("hybrid_search", "推荐三个适合新手的家常菜", 3, None) in retrieval_module.calls
+    assert ("hybrid_search", "推荐三个适合新手的家常菜", 9, None) in retrieval_module.calls
+
+
+def test_recommendation_fallback_rejects_unrelated_broad_candidates():
+    fallback_docs = [
+        _doc("酸梅汤", "steps", "饮品 酸甜"),
+        _doc("奶茶", "steps", "饮品 甜味"),
+    ]
+    retrieval_module = FakeRetrievalModule(filtered_docs=[], hybrid_docs=fallback_docs)
+    executor = RetrievalExecutor(retrieval_module)
+
+    result = executor.execute(
+        {
+            "query": "推荐三个适合新手的家常菜",
+            "original_query": "推荐三个适合新手的家常菜",
+            "dish_name": None,
+            "filters": {"difficulty": ["新手"]},
+            "top_k": 3,
+            "fallback_policy": "relaxed_filters",
+            "hard_filters": [],
+            "soft_filters": ["difficulty"],
+            "answer_mode_hint": "recommendation",
+            "route_type": "list",
+        }
+    )
+
+    assert result["chunks"] == []
+    assert result["low_evidence"]["answer_type"] == "no_result"
+    assert result["trace"]["strategy"] == "low_evidence"
 
 
 def test_recommendation_query_does_not_require_exact_dish_identity():
@@ -494,10 +523,10 @@ Run:
 
 ```bash
 cd code/C8
-pytest tests/test_retrieval_executor.py::test_recommendation_query_uses_controlled_broad_fallback_when_primary_empty tests/test_retrieval_executor.py::test_recommendation_query_does_not_require_exact_dish_identity -q
+pytest tests/test_retrieval_executor.py::test_recommendation_query_uses_controlled_broad_fallback_when_primary_empty tests/test_retrieval_executor.py::test_recommendation_fallback_rejects_unrelated_broad_candidates tests/test_retrieval_executor.py::test_recommendation_query_does_not_require_exact_dish_identity -q
 ```
 
-Expected: FAIL because no `identity` field exists and no `recommendation_fallback` strategy exists.
+Expected: FAIL because no `identity` field exists, no `recommendation_fallback` strategy exists, and unrelated fallback candidates are not filtered.
 
 - [ ] **Step 3: Add recommendation query detection**
 
@@ -541,14 +570,50 @@ Add this method to `RetrievalExecutor`:
 
 ```python
     def _recommendation_fallback_retrieval(self, query_plan: dict) -> list[Document]:
-        chunks = list(
+        broad_candidates = list(
             self.retrieval_module.hybrid_search(
                 query_plan["query"],
-                top_k=query_plan.get("top_k", 3),
+                top_k=query_plan.get("top_k", 3) * 3,
                 query_dish=None,
             )
         )
+        chunks = self._select_recommendation_fallback_chunks(query_plan, broad_candidates)
         return self._mark_fallback(chunks)
+```
+
+Add these helpers to `RetrievalExecutor`:
+
+```python
+    def _recommendation_query_terms(self, query_plan: dict) -> set[str]:
+        query = str(query_plan.get("query") or "")
+        filters = query_plan.get("filters") or {}
+        terms = {term for term in ("新手", "简单", "家常", "下饭", "带饭", "不辣", "快手", "少油", "晚饭", "鸡", "鸡肉", "豆腐", "鸡蛋", "土豆") if term in query}
+        for value in filters.values():
+            if isinstance(value, list):
+                terms.update(str(item) for item in value if item)
+            elif value:
+                terms.add(str(value))
+        return {term for term in terms if term}
+
+    def _select_recommendation_fallback_chunks(self, query_plan: dict, candidates: list[Document]) -> list[Document]:
+        terms = self._recommendation_query_terms(query_plan)
+        selected: list[Document] = []
+        seen_dishes: set[str] = set()
+        for doc in candidates:
+            dish_name = (doc.metadata or {}).get("dish_name")
+            content_type = (doc.metadata or {}).get("content_type")
+            if not dish_name or content_type in {"drink", "beverage"}:
+                continue
+            text = f"{dish_name}\n{doc.page_content}"
+            if terms and not any(term in text for term in terms):
+                continue
+            if dish_name in seen_dishes:
+                continue
+            seen_dishes.add(dish_name)
+            selected.append(doc)
+            if len(selected) >= query_plan.get("top_k", 3):
+                break
+        return selected
 ```
 
 - [ ] **Step 5: Add identity default in quality**
@@ -689,16 +754,27 @@ Expected: FAIL because synthetic food-like domain classification and identity ha
 In `code/C8/rag_modules/turn_understanding.py`, add:
 
 ```python
-FOOD_LIKE_DETAIL_SIGNALS = {
-    "空气炸",
+FOOD_NOUN_SIGNALS = {
+    "炒饭",
     "火锅",
     "豆腐",
     "鸡翅",
-    "炒饭",
     "土豆丝",
+    "鸡",
+    "鱼",
+    "肉",
+    "菜",
+}
+
+FOOD_DETAIL_INTENT_SIGNALS = {
     "需要什么",
     "怎么做",
+    "怎么炒",
+    "能不能",
     "少盐",
+    "少油",
+    "不辣",
+    "空气炸",
 }
 ```
 
@@ -706,10 +782,13 @@ Add helper:
 
 ```python
 def _has_food_like_detail_signal(text: str) -> bool:
-    return any(signal in text for signal in FOOD_LIKE_DETAIL_SIGNALS)
+    return (
+        any(noun in text for noun in FOOD_NOUN_SIGNALS)
+        and any(intent in text for intent in FOOD_DETAIL_INTENT_SIGNALS)
+    )
 ```
 
-Before the final `domain_reject` fallback in `understand_turn()`, add:
+After the explicit out-of-domain check and before the final `domain_reject` fallback in `understand_turn()`, add:
 
 ```python
     if _has_food_like_detail_signal(text):
@@ -1104,7 +1183,7 @@ Run:
 
 ```powershell
 cd code/C8
-@'
+$script = @'
 import json
 from pathlib import Path
 
@@ -1166,7 +1245,10 @@ OUTPUT.write_text(
     encoding="utf-8",
 )
 print(f"wrote {OUTPUT} with {len(badcase_scenarios)} focal badcases")
-'@ | python -
+'@
+Set-Content -Path .\e2e\build_badcase_scenarios_tmp.py -Value $script -Encoding UTF8
+python .\e2e\build_badcase_scenarios_tmp.py
+Remove-Item .\e2e\build_badcase_scenarios_tmp.py
 ```
 
 Expected:
@@ -1196,7 +1278,7 @@ Run:
 
 ```powershell
 cd code/C8
-@'
+$script = @'
 import json
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -1242,7 +1324,10 @@ for row in focal:
         "Q=",
         row["question"],
     )
-'@ | python -
+'@
+Set-Content -Path .\e2e\summarize_badcase_results_tmp.py -Value $script -Encoding UTF8
+python .\e2e\summarize_badcase_results_tmp.py
+Remove-Item .\e2e\summarize_badcase_results_tmp.py
 ```
 
 Expected output should show clear improvement over the previous 20 focal failures. A good short-pass target is:
