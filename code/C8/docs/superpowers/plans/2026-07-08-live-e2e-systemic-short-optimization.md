@@ -19,7 +19,8 @@
 - Do not add broad, unbounded fallback that turns low-evidence questions into hallucinated answers.
 - Do not preserve unused old paths after new module contracts replace them.
 - Every fix must follow `badcase -> failure class -> module contract -> general rule -> regression tests`.
-- Target live result: `Core >= 45/50`, `Total >= 75/85`.
+- Targeted live validation result: previously failing focal badcases should mostly pass after the systemic fixes.
+- Full live regression remains useful as a release/stage gate, but this short optimization plan does not require rerunning Core 50 or All 85 after every iteration.
 
 ---
 
@@ -1059,15 +1060,17 @@ git commit -m "test: verify systemic optimization regression"
 
 ---
 
-### Task 7: Live Smoke, Core, And All-85 Validation
+### Task 7: Targeted Live Badcase Validation
 
 **Files:**
 - Generated only: `code/C8/e2e/results/*.jsonl`
 - Generated only: `code/C8/e2e/results/*.md`
+- Generated only: `code/C8/e2e/scenarios/live_e2e_badcases_20260708.json`
 
 **Interfaces:**
 - Consumes: live DashScope credential from `.env`.
-- Produces: post-optimization live evidence classified by systemic failure class.
+- Consumes: previous failed live JSONL reports.
+- Produces: post-optimization live evidence for previously failing focal badcases.
 
 - [ ] **Step 1: Confirm API key**
 
@@ -1095,42 +1098,157 @@ python e2e/live_e2e_runner.py --models qwen-plus-2025-07-28 --suite core --limit
 
 Expected: command exits `0`; generated Markdown report has `Total turns: 1` and PASS.
 
-- [ ] **Step 3: Run Core 50**
+- [ ] **Step 3: Generate targeted badcase scenario file from previous failures**
 
 Run:
 
-```bash
+```powershell
 cd code/C8
-python e2e/live_e2e_runner.py --models qwen-plus-2025-07-28 --suite core --limit-turns 50 --delay-seconds 5 --max-retries 1
+@'
+import json
+from pathlib import Path
+
+SOURCE_SCENARIOS = Path("e2e/scenarios/live_e2e_scenarios.json")
+FAILED_RUNS = [
+    Path("e2e/results/live-e2e-20260708-004151.jsonl"),
+    Path("e2e/results/live-e2e-20260708-004937.jsonl"),
+]
+OUTPUT = Path("e2e/scenarios/live_e2e_badcases_20260708.json")
+
+source = json.loads(SOURCE_SCENARIOS.read_text(encoding="utf-8"))
+source_by_id = {scenario["id"]: scenario for scenario in source["scenarios"]}
+
+failed_rows = []
+for path in FAILED_RUNS:
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        row = json.loads(line)
+        if row["status"] != "PASS":
+            failed_rows.append(row)
+
+badcase_scenarios = []
+for index, row in enumerate(failed_rows, start=1):
+    source_scenario = source_by_id[row["scenario_id"]]
+    matched_index = None
+    for turn_index, turn in enumerate(source_scenario["turns"]):
+        if turn["question"] == row["question"]:
+            matched_index = turn_index
+            break
+    if matched_index is None:
+        raise RuntimeError(f"could not map failed row back to source turn: {row['scenario_id']} {row['question']}")
+
+    # Stateful failures need the conversation prefix to reproduce reference state.
+    # The focal badcase is always the last turn of the generated scenario.
+    prefix_turns = source_scenario["turns"][: matched_index + 1]
+    badcase_scenarios.append(
+        {
+            "id": f"badcase_{index:03d}_{row['scenario_id']}",
+            "suite": "badcase",
+            "category": row["category"],
+            "session_id": f"badcase-{index:03d}",
+            "source_scenario_id": row["scenario_id"],
+            "source_question": row["question"],
+            "source_failure": {
+                "status": row["status"],
+                "error": row.get("error"),
+                "generation_mode": row.get("generation_mode"),
+                "retrieval_strategy": row.get("retrieval_strategy"),
+                "quality_reason": row.get("quality_reason"),
+            },
+            "focal_turn_position": len(prefix_turns),
+            "turns": prefix_turns,
+        }
+    )
+
+OUTPUT.write_text(
+    json.dumps({"version": 1, "scenarios": badcase_scenarios}, ensure_ascii=False, indent=2) + "\n",
+    encoding="utf-8",
+)
+print(f"wrote {OUTPUT} with {len(badcase_scenarios)} focal badcases")
+'@ | python -
 ```
 
-Expected: command exits `0`; Core score should be at least `45/50`.
-
-- [ ] **Step 4: Run All 85**
-
-Run:
-
-```bash
-cd code/C8
-python e2e/live_e2e_runner.py --models qwen-plus-2025-07-28 --suite all --limit-turns 85 --delay-seconds 5 --max-retries 1
-```
-
-Expected: command exits `0`; Total score should be at least `75/85`.
-
-- [ ] **Step 5: Summarize newest JSONL report**
-
-Run:
-
-```bash
-cd code/C8
-python -c "import json; from pathlib import Path; from collections import Counter,defaultdict; files=sorted(Path('e2e/results').glob('live-e2e-*.jsonl'), key=lambda p:p.stat().st_mtime); p=files[-1]; rows=[json.loads(line) for line in p.read_text(encoding='utf-8').splitlines() if line.strip()]; suites=defaultdict(list); cats=defaultdict(list); [suites[r.get('suite','core')].append(r) or cats[r['category']].append(r) for r in rows]; print('report', p); [print(f\"suite {k}: {sum(1 for r in v if r['status']=='PASS')}/{len(v)}\") for k,v in sorted(suites.items())]; print(f\"total: {sum(1 for r in rows if r['status']=='PASS')}/{len(rows)}\"); [print(f\"category {k}: {sum(1 for r in cats[k] if r['status']=='PASS')}/{len(cats[k])}\") for k in ['single_recipe_detail','recommendation_list','multi_turn_reference','substitution_constraint']]; print('status', dict(Counter(r['status'] for r in rows))); print('failures'); [print(r.get('suite','core'), r['category'], r['scenario_id'], r['turn_index'], r['status'], r.get('generation_mode'), r.get('retrieval_strategy'), r.get('quality_reason'), r.get('error')) for r in rows if r['status']!='PASS']"
-```
-
-Expected output includes:
+Expected:
 
 ```text
-suite core: >=45/50
-total: >=75/85
+wrote e2e/scenarios/live_e2e_badcases_20260708.json with 20 focal badcases
+```
+
+If a future baseline has a different number of failures, the count may differ. The important requirement is that every failed row maps to one generated badcase scenario, and the failed turn is the last turn in that scenario.
+
+- [ ] **Step 4: Run targeted badcases**
+
+Run:
+
+```bash
+cd code/C8
+python e2e/live_e2e_runner.py --models qwen-plus-2025-07-28 --scenario-file e2e/scenarios/live_e2e_badcases_20260708.json --suite all --delay-seconds 5 --max-retries 1
+```
+
+Expected: command exits `0`.
+
+This run may contain setup turns for stateful badcases. Do not evaluate it only by the raw total pass rate. The focal badcase is the last turn of each generated `badcase_*` scenario.
+
+- [ ] **Step 5: Summarize focal badcase results**
+
+Run:
+
+```powershell
+cd code/C8
+@'
+import json
+from collections import Counter, defaultdict
+from pathlib import Path
+
+files = sorted(Path("e2e/results").glob("live-e2e-*.jsonl"), key=lambda p: p.stat().st_mtime)
+report = files[-1]
+rows = [json.loads(line) for line in report.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+by_scenario = defaultdict(list)
+for row in rows:
+    by_scenario[row["scenario_id"]].append(row)
+
+focal = [
+    max(scenario_rows, key=lambda row: row["turn_index"])
+    for scenario_rows in by_scenario.values()
+    if scenario_rows[0]["scenario_id"].startswith("badcase_")
+]
+
+print("report", report)
+print(f"focal: {sum(1 for row in focal if row['status'] == 'PASS')}/{len(focal)}")
+print("focal status", dict(Counter(row["status"] for row in focal)))
+
+by_category = defaultdict(list)
+for row in focal:
+    by_category[row["category"]].append(row)
+
+print("focal categories")
+for category, category_rows in sorted(by_category.items()):
+    print(category, dict(Counter(row["status"] for row in category_rows)))
+
+print("remaining focal failures")
+for row in focal:
+    if row["status"] == "PASS":
+        continue
+    print(
+        row["category"],
+        row["scenario_id"],
+        row["status"],
+        row.get("generation_mode"),
+        row.get("retrieval_strategy"),
+        row.get("quality_reason"),
+        row.get("error"),
+        "Q=",
+        row["question"],
+    )
+'@ | python -
+```
+
+Expected output should show clear improvement over the previous 20 focal failures. A good short-pass target is:
+
+```text
+focal: >=15/20
 ```
 
 - [ ] **Step 6: Classify remaining failures by systemic class**
@@ -1147,6 +1265,8 @@ external_or_infra
 ```
 
 Do not mark the optimization accepted if failures still show wrong-dish structured answers or similar-dish fallback presented as exact evidence.
+
+Do not require a full Core 50 or All 85 run in this task. Full-suite live acceptance is deferred to a release/stage gate after the targeted badcase run is healthy.
 
 - [ ] **Step 7: Commit reports only if reports are tracked**
 
