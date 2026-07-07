@@ -32,6 +32,14 @@ class TurnResult:
     latency_ms: int
     attempt: int
     error: str | None
+    model_requested: str | None = None
+    generation_mode: str | None = None
+    context_doc_count: int | None = None
+    retrieval_strategy: str | None = None
+    quality_reason: str | None = None
+    selected_dishes: list[str] | None = None
+    fallback_used: bool | None = None
+    dish_alias_used: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -50,6 +58,14 @@ class TurnResult:
             "latency_ms": self.latency_ms,
             "attempt": self.attempt,
             "error": self.error,
+            "model_requested": self.model_requested,
+            "generation_mode": self.generation_mode,
+            "context_doc_count": self.context_doc_count,
+            "retrieval_strategy": self.retrieval_strategy,
+            "quality_reason": self.quality_reason,
+            "selected_dishes": self.selected_dishes,
+            "fallback_used": self.fallback_used,
+            "dish_alias_used": self.dish_alias_used,
         }
 
 
@@ -64,6 +80,23 @@ def classify_error_text(error: str) -> str:
     if "data" in text or "index" in text or "vector" in text:
         return DATA_ERROR
     return INFRA_ERROR
+
+
+def _diagnostic_fields(diagnostics: dict[str, Any] | None, model: str) -> dict[str, Any]:
+    diagnostics = diagnostics or {}
+    generation = diagnostics.get("generation") if isinstance(diagnostics.get("generation"), dict) else {}
+    retrieval = diagnostics.get("retrieval") if isinstance(diagnostics.get("retrieval"), dict) else {}
+    selected = retrieval.get("selected_dishes")
+    return {
+        "model_requested": diagnostics.get("model_requested") or model,
+        "generation_mode": generation.get("strategy"),
+        "context_doc_count": generation.get("context_doc_count"),
+        "retrieval_strategy": retrieval.get("strategy"),
+        "quality_reason": retrieval.get("quality_reason"),
+        "selected_dishes": selected if isinstance(selected, list) else None,
+        "fallback_used": retrieval.get("fallback_used"),
+        "dish_alias_used": retrieval.get("dish_alias_used"),
+    }
 
 
 def _as_list(value: Any) -> list[str]:
@@ -97,7 +130,9 @@ def evaluate_assertions(
     attempt: int,
     sse_done_event: bool | None,
     error: str | None,
+    diagnostics: dict[str, Any] | None = None,
 ) -> TurnResult:
+    diagnostic_fields = _diagnostic_fields(diagnostics, model)
     if error:
         failure_class = classify_error_text(error)
         return TurnResult(
@@ -116,6 +151,7 @@ def evaluate_assertions(
             latency_ms=latency_ms,
             attempt=attempt,
             error=error,
+            **diagnostic_fields,
         )
 
     reasons: list[str] = []
@@ -164,4 +200,5 @@ def evaluate_assertions(
         latency_ms=latency_ms,
         attempt=attempt,
         error=reason_text,
+        **diagnostic_fields,
     )

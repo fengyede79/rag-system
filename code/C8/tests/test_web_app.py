@@ -85,3 +85,41 @@ def test_stream_endpoint_is_equivalent_to_non_stream_endpoint():
     assert "data: 你好，" in payload
     assert "data: 这是流式回答。" in payload
     assert "event: done" in payload
+
+
+def test_chat_can_return_diagnostics_when_requested():
+    class FakeGeneration:
+        model_name = "qwen-plus-2025-07-28"
+        last_generation_trace = {"strategy": "structured", "context_doc_count": 1}
+
+    class FakeSystem:
+        generation_module = FakeGeneration()
+        last_execution_result = {}
+
+        def ask_question(self, question, stream=False, session_id="default"):
+            self.last_execution_result = {
+                "retrieval_trace": {
+                    "strategy": "primary",
+                    "quality_reason": "exact_dish_matched",
+                    "selected_dishes": ["蛋炒饭"],
+                    "fallback_used": False,
+                },
+                "retrieval_quality": {"quality_reason": "exact_dish_matched"},
+                "context_pack_trace": {"context_doc_count": 1},
+            }
+            return "诊断回答"
+
+    app = create_app(system_factory=lambda: FakeSystem())
+    client = app.test_client()
+
+    response = client.post(
+        "/api/chat",
+        json={"question": "蛋炒饭怎么做？", "session_id": "s1", "include_diagnostics": True},
+    )
+
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload["answer"] == "诊断回答"
+    assert payload["diagnostics"]["generation"]["strategy"] == "structured"
+    assert payload["diagnostics"]["retrieval"]["strategy"] == "primary"
+    assert payload["diagnostics"]["model_requested"] == "qwen-plus-2025-07-28"

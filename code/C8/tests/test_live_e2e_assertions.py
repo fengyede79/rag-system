@@ -88,3 +88,43 @@ def test_turn_result_json_line_masks_none_values_consistently():
     assert payload["model"] == "qwen-max"
     assert payload["failure_class"] is None
     assert payload["answer"] == "我主要处理食谱问题。"
+
+
+def test_turn_result_records_optional_diagnostics():
+    result = evaluate_assertions(
+        run_id="run",
+        model="qwen-plus-2025-07-28",
+        scenario_id="s1",
+        category="single_recipe_detail",
+        session_id="sess",
+        turn_index=1,
+        endpoint="chat",
+        question="蛋炒饭怎么做？",
+        http_status=200,
+        answer="蛋炒饭需要鸡蛋和米饭。",
+        assertions={"http_status": 200, "answer_contains_any": ["蛋炒饭"]},
+        latency_ms=10,
+        attempt=1,
+        sse_done_event=None,
+        error=None,
+        diagnostics={
+            "model_requested": "qwen-plus-2025-07-28",
+            "generation": {"strategy": "structured", "context_doc_count": 2},
+            "retrieval": {
+                "strategy": "alias_fallback",
+                "quality_reason": "alias_dish_matched",
+                "selected_dishes": ["西红柿炒鸡蛋"],
+                "fallback_used": True,
+                "dish_alias_used": "西红柿炒鸡蛋",
+            },
+        },
+    )
+
+    assert result.model_requested == "qwen-plus-2025-07-28"
+    assert result.generation_mode == "structured"
+    assert result.context_doc_count == 2
+    assert result.retrieval_strategy == "alias_fallback"
+    assert result.quality_reason == "alias_dish_matched"
+    assert result.selected_dishes == ["西红柿炒鸡蛋"]
+    assert result.fallback_used is True
+    assert result.dish_alias_used == "西红柿炒鸡蛋"

@@ -44,6 +44,51 @@ def _default_system_factory() -> RecipeRAGSystem:
     return system
 
 
+def _build_live_diagnostics(system: RecipeRAGSystem) -> dict:
+    execution = getattr(system, "last_execution_result", {}) or {}
+    generation_module = getattr(system, "generation_module", None)
+    generation_trace = getattr(generation_module, "last_generation_trace", {}) or {}
+    retrieval_trace = execution.get("retrieval_trace") or {}
+    retrieval_quality = execution.get("retrieval_quality") or {}
+    context_trace = execution.get("context_pack_trace") or {}
+    model_requested = (
+        getattr(generation_module, "model_name", None)
+        or getattr(getattr(system, "config", None), "llm_model", None)
+    )
+
+    generation_strategy = generation_trace.get("strategy")
+    if not generation_strategy and execution.get("answer_type") == "no_result":
+        generation_strategy = "no_context"
+    if not generation_strategy and execution.get("answer_mode") == "recommendation":
+        generation_strategy = "list_template"
+
+    context_doc_count = generation_trace.get("context_doc_count")
+    if context_doc_count is None:
+        context_doc_count = context_trace.get("context_doc_count")
+
+    def first_present(primary: dict, secondary: dict, key: str):
+        if key in primary:
+            return primary.get(key)
+        return secondary.get(key)
+
+    return {
+        "model_requested": model_requested,
+        "generation": {
+            "strategy": generation_strategy,
+            "context_doc_count": context_doc_count,
+            "content_type": generation_trace.get("content_type"),
+        },
+        "retrieval": {
+            "strategy": retrieval_trace.get("strategy"),
+            "quality_reason": first_present(retrieval_trace, retrieval_quality, "quality_reason"),
+            "selected_dishes": first_present(retrieval_trace, retrieval_quality, "selected_dishes"),
+            "fallback_used": first_present(retrieval_trace, retrieval_quality, "fallback_used"),
+            "relaxed_filter": first_present(retrieval_trace, retrieval_quality, "relaxed_filter"),
+            "dish_alias_used": retrieval_trace.get("dish_alias_used"),
+        },
+    }
+
+
 def create_app(
     system_factory: Optional[Callable[[], RecipeRAGSystem]] = None,
     log_path: Optional[Path] = None,
@@ -70,20 +115,27 @@ def create_app(
         payload = request.get_json(silent=True) or {}
         question = (payload.get("question") or "").strip()
         session_id = (payload.get("session_id") or "default").strip() or "default"
+        include_diagnostics = bool(payload.get("include_diagnostics"))
         if not question:
             return jsonify({"error": "question is required"}), 400
 
         logger.info("收到 /api/chat 请求: session_id=%s question=%s", session_id, question)
         system = get_system()
-        answer = system.ask_question(question, stream=False, session_id=session_id)
-        if isinstance(answer, dict):
-            answer = answer.get("answer", "")
+        result = system.ask_question(question, stream=False, session_id=session_id)
+        if isinstance(result, dict):
+            answer = result.get("answer", "")
+        else:
+            answer = result
+        diagnostics = _build_live_diagnostics(system) if include_diagnostics else None
         logger.info(
             "完成 /api/chat 请求: session_id=%s answer_length=%s",
             session_id,
             len(answer or ""),
         )
-        return jsonify({"answer": answer})
+        response_payload = {"answer": answer}
+        if include_diagnostics:
+            response_payload["diagnostics"] = diagnostics
+        return jsonify(response_payload)
 
     @app.get("/api/chat/stream")
     def chat_stream():

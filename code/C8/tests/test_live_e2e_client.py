@@ -1,4 +1,4 @@
-from e2e.client import parse_sse_events
+from e2e.client import parse_sse_events, parse_chat_payload
 
 
 def test_parse_sse_events_collects_messages_and_done():
@@ -26,3 +26,15 @@ def test_parse_sse_events_records_error_event():
     assert parsed.answer == ""
     assert parsed.done is False
     assert parsed.error == "{\"message\":\"boom\"}"
+
+
+def test_parse_chat_payload_with_diagnostics():
+    payload = {
+        "answer": "回答",
+        "diagnostics": {"generation": {"strategy": "structured"}},
+    }
+
+    answer, diagnostics = parse_chat_payload(payload)
+
+    assert answer == "回答"
+    assert diagnostics == {"generation": {"strategy": "structured"}}

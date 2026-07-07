@@ -6,6 +6,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -15,6 +16,7 @@ class HTTPResult:
     latency_ms: int
     error: str | None = None
     sse_done_event: bool | None = None
+    diagnostics: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -51,6 +53,12 @@ def parse_sse_events(raw: str) -> ParsedSSE:
     return ParsedSSE(answer="".join(answer_parts), done=done, events=events, error=error)
 
 
+def parse_chat_payload(payload: dict[str, Any]) -> tuple[str, dict[str, Any] | None]:
+    answer = str(payload.get("answer", ""))
+    diagnostics = payload.get("diagnostics")
+    return answer, diagnostics if isinstance(diagnostics, dict) else None
+
+
 class LiveE2EClient:
     def __init__(self, *, base_url: str, request_timeout_seconds: int, stream_timeout_seconds: int):
         self.base_url = base_url.rstrip("/")
@@ -72,7 +80,10 @@ class LiveE2EClient:
 
     def chat(self, *, question: str, session_id: str) -> HTTPResult:
         started = time.time()
-        body = json.dumps({"question": question, "session_id": session_id}, ensure_ascii=False).encode("utf-8")
+        body = json.dumps(
+            {"question": question, "session_id": session_id, "include_diagnostics": True},
+            ensure_ascii=False,
+        ).encode("utf-8")
         request = urllib.request.Request(
             f"{self.base_url}/api/chat",
             data=body,
@@ -82,10 +93,12 @@ class LiveE2EClient:
         try:
             with urllib.request.urlopen(request, timeout=self.request_timeout_seconds) as response:
                 payload = json.loads(response.read().decode("utf-8"))
+                answer, diagnostics = parse_chat_payload(payload)
                 return HTTPResult(
                     http_status=response.status,
-                    answer=str(payload.get("answer", "")),
+                    answer=answer,
                     latency_ms=int((time.time() - started) * 1000),
+                    diagnostics=diagnostics,
                 )
         except urllib.error.HTTPError as exc:
             return HTTPResult(

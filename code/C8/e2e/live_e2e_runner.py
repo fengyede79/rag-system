@@ -115,6 +115,7 @@ def run_model(
                     attempt=attempt,
                     sse_done_event=response.sse_done_event,
                     error=response.error,
+                    diagnostics=response.diagnostics,
                 )
                 if final_result.status != RATE_LIMITED:
                     break
