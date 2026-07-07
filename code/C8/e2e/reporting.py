@@ -13,6 +13,8 @@ def summarize_results(results: list[TurnResult]) -> dict:
         "by_status": dict(Counter(result.status for result in results)),
         "by_model": dict(Counter(result.model for result in results)),
         "by_category": dict(Counter(result.category for result in results)),
+        "by_generation_mode": dict(Counter(result.generation_mode or "unknown" for result in results)),
+        "by_retrieval_strategy": dict(Counter(result.retrieval_strategy or "unknown" for result in results)),
     }
 
 
@@ -63,14 +65,28 @@ def write_markdown_report(
         "",
         _table(summary["by_category"]),
         "",
+        "## Generation Mode Summary",
+        "",
+        _table(summary["by_generation_mode"]),
+        "",
+        "## Retrieval Strategy Summary",
+        "",
+        _table(summary["by_retrieval_strategy"]),
+        "",
         "## Failure Table",
         "",
-        "| Model | Scenario | Turn | Status | Error |",
-        "| --- | --- | ---: | --- | --- |",
+        "| Model | Scenario | Turn | Status | Generation | Retrieval | Quality Reason | Error |",
+        "| --- | --- | ---: | --- | --- | --- | --- | --- |",
     ]
     for result in failures:
         error = (result.error or "").replace("|", "\\|").replace("\n", " ")[:240]
-        lines.append(f"| {result.model} | {result.scenario_id} | {result.turn_index} | {result.status} | {error} |")
+        generation = result.generation_mode or "unknown"
+        retrieval = result.retrieval_strategy or "unknown"
+        quality = (result.quality_reason or "").replace("|", "\\|")[:120]
+        lines.append(
+            f"| {result.model} | {result.scenario_id} | {result.turn_index} | {result.status} "
+            f"| {generation} | {retrieval} | {quality} | {error} |"
+        )
 
     lines.extend([
         "",
