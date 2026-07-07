@@ -68,7 +68,7 @@ def build_retrieval_query_plan(
     )
 
     hard_filters: list[str] = []
-    if dish_name:
+    if dish_name and route_type != "list":
         filters["dish_name"] = dish_name
         hard_filters.append("dish_name")
 
@@ -164,6 +164,22 @@ class RetrievalExecutor:
                         quality=fallback_quality,
                     ),
                 }
+
+        list_broad_chunks = self._list_broad_fallback(query_plan)
+        if list_broad_chunks:
+            list_quality = self._check_list_quality(query_plan, list_broad_chunks)
+            return {
+                "chunks": list_broad_chunks,
+                "quality": list_quality,
+                "low_evidence": None,
+                "trace": self._build_trace(
+                    query_plan=query_plan,
+                    strategy="list_broad_hybrid",
+                    primary_count=len(primary_chunks),
+                    fallback_count=len(list_broad_chunks),
+                    quality=list_quality,
+                ),
+            }
 
         return {
             "chunks": [],
@@ -355,6 +371,35 @@ class RetrievalExecutor:
         hard_filters = set(query_plan.get("hard_filters") or [])
         droppable_keys = set(SOFT_FILTER_KEYS) | {"content_type"}
         return {key: value for key, value in filters.items() if key in hard_filters or key not in droppable_keys}
+
+    def _list_broad_fallback(self, query_plan: dict) -> list[Document]:
+        route_type = query_plan.get("route_type", "detail")
+        answer_mode = query_plan.get("answer_mode_hint", "")
+        if route_type != "list" and answer_mode != "recommendation":
+            return []
+        chunks = list(
+            self.retrieval_module.hybrid_search(
+                query_plan["query"],
+                top_k=query_plan.get("top_k", 3),
+                query_dish=None,
+            )
+        )
+        for chunk in chunks:
+            chunk.metadata["fallback"] = True
+            chunk.metadata["relaxed_filter"] = True
+        return chunks
+
+    def _check_list_quality(self, query_plan: dict, chunks: list[Document]) -> dict:
+        selected_dishes = self._selected_dishes(chunks)
+        enough = len(chunks) > 0 and len(selected_dishes) > 0
+        return {
+            "enough_evidence": enough,
+            "quality_reason": "list_candidates_found" if enough else "no_candidates",
+            "fallback_used": True,
+            "relaxed_filter": True,
+            "candidate_count": len(chunks),
+            "selected_dishes": selected_dishes,
+        }
 
     def _mark_fallback(self, chunks: list[Document], dish_alias_used: str | None = None) -> list[Document]:
         for chunk in chunks:

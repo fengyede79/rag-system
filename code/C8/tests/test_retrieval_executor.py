@@ -419,3 +419,63 @@ def test_alias_fallback_keeps_low_evidence_when_alias_returns_wrong_dish():
     assert result["chunks"] == []
     assert result["low_evidence"]["answer_type"] == "no_result"
     assert result["trace"]["strategy"] == "low_evidence"
+
+
+def test_build_query_plan_does_not_hard_filter_dish_for_list_route():
+    plan = build_retrieval_query_plan(
+        original_query="推荐三个新手菜",
+        rewritten_query="推荐三个新手菜",
+        base_query_plan={"route_type": "list", "dish_name": None, "filters": {"category": "新手菜"}},
+        execution_plan={"action": "retrieve_list"},
+        resolution=None,
+        preference_constraints=None,
+        top_k=3,
+    )
+    assert "dish_name" not in plan["hard_filters"]
+
+
+def test_list_broad_fallback_triggers_when_primary_and_relaxed_empty():
+    broad_docs = [_doc("宫保鸡丁"), _doc("可乐鸡翅")]
+    retrieval_module = FakeRetrievalModule(filtered_docs=[], hybrid_docs=broad_docs)
+    executor = RetrievalExecutor(retrieval_module)
+
+    result = executor.execute(
+        {
+            "query": "推荐三个新手菜",
+            "original_query": "推荐三个新手菜",
+            "dish_name": None,
+            "filters": {"category": "新手菜"},
+            "top_k": 3,
+            "fallback_policy": "relaxed_filters",
+            "hard_filters": [],
+            "soft_filters": ["category"],
+            "answer_mode_hint": "recommendation",
+            "route_type": "list",
+        }
+    )
+
+    assert result["chunks"]
+    assert result["trace"]["strategy"] == "list_broad_hybrid"
+    assert result["quality"]["enough_evidence"] is True
+
+
+def test_list_broad_fallback_does_not_trigger_for_detail_route():
+    retrieval_module = FakeRetrievalModule(filtered_docs=[], hybrid_docs=[_doc("蛋炒饭")])
+    executor = RetrievalExecutor(retrieval_module)
+
+    result = executor.execute(
+        {
+            "query": "不存在的菜怎么做",
+            "original_query": "不存在的菜怎么做",
+            "dish_name": "不存在的菜",
+            "filters": {"dish_name": "不存在的菜"},
+            "top_k": 3,
+            "fallback_policy": "relaxed_filters",
+            "hard_filters": ["dish_name"],
+            "soft_filters": [],
+            "answer_mode_hint": "recipe_detail",
+            "route_type": "detail",
+        }
+    )
+
+    assert result["trace"]["strategy"] != "list_broad_hybrid"
