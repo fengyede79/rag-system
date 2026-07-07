@@ -101,3 +101,32 @@ def test_select_turns_filters_suite_before_limit():
     assert len(selected) == 1
     assert selected[0][0].id == "extended-1"
     assert selected[0][1].question == "拍黄瓜怎么做？"
+
+
+def test_runner_defaults_to_all_suite():
+    args = build_arg_parser().parse_args([])
+
+    assert args.suite == "all"
+
+
+def test_select_turns_all_suite_keeps_global_order_with_limit():
+    scenarios = [
+        Scenario(
+            id="core-1",
+            category="domain_reject",
+            session_id="core-session",
+            suite="core",
+            turns=[ScenarioTurn(question="Python 怎么学？", endpoint="chat", assertions={})],
+        ),
+        Scenario(
+            id="extended-1",
+            category="single_recipe_detail",
+            session_id="extended-session",
+            suite="extended",
+            turns=[ScenarioTurn(question="拍黄瓜怎么做？", endpoint="chat", assertions={})],
+        ),
+    ]
+
+    selected = select_turns_for_run(scenarios, suite="all", limit_turns=2)
+
+    assert [scenario.id for scenario, _turn in selected] == ["core-1", "extended-1"]

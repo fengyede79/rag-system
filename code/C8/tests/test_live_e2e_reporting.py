@@ -138,3 +138,11 @@ def test_markdown_report_includes_suite_summary_and_failure_suite_column(tmp_pat
     assert "| total | 2 | 1 | 1 | 50.0% |" in report
     assert "| Suite | Model | Scenario | Turn | Status | Generation | Retrieval | Quality Reason | Error |" in report
     assert "| extended | qwen-plus-2025-07-28 |" in report
+
+
+def test_jsonl_report_includes_suite(tmp_path: Path):
+    jsonl = tmp_path / "run.jsonl"
+
+    write_jsonl_report(jsonl, [_result("PASS", suite="extended")])
+
+    assert '"suite": "extended"' in jsonl.read_text(encoding="utf-8")
