@@ -19,6 +19,7 @@ class Scenario:
     category: str
     session_id: str
     turns: list[ScenarioTurn]
+    suite: str = "core"
 
 
 def load_scenarios(path: Path) -> list[Scenario]:
@@ -39,9 +40,18 @@ def load_scenarios(path: Path) -> list[Scenario]:
                 category=str(raw["category"]),
                 session_id=str(raw["session_id"]),
                 turns=turns,
+                suite=str(raw.get("suite", "core")),
             )
         )
     return scenarios
+
+
+def filter_scenarios_by_suite(scenarios: list[Scenario], suite: str) -> list[Scenario]:
+    if suite == "all":
+        return list(scenarios)
+    if suite not in {"core", "extended"}:
+        raise ValueError("suite must be one of: core, extended, all")
+    return [scenario for scenario in scenarios if scenario.suite == suite]
 
 
 def flatten_turns(
