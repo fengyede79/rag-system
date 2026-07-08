@@ -15,46 +15,73 @@
 
 ## 系统架构
 
-```text
-Client / Browser
-    |
-    v
-Flask Web Service
-    |-- /api/chat
-    |-- /api/chat/stream
-    |
-    v
-RecipeRAGSystem
-    |
-    |-- Session Store
-    |     |-- session_id 隔离
-    |     |-- state_version
-    |     |-- current_dish / current_entities
-    |     |-- last_recommendation_list
-    |     `-- turn_lifecycle
-    |
-    |-- Turn Runtime
-    |     |-- turn_id / trace_id
-    |     |-- read_state_version
-    |     |-- replan_count
-    |     `-- streaming lifecycle
-    |
-    |-- Main Runtime Chain
-    |     |-- Safety Gate
-    |     |-- Turn Understanding
-    |     |-- Reference Resolution
-    |     |-- Execution Plan
-    |     |-- Query Plan
-    |     |-- Retrieval Executor
-    |     |-- Context Packer
-    |     |-- Answer Generation / SSE
-    |     `-- StateUpdatePolicy
-    |
-    `-- Live E2E Runner
-          |-- real Flask service
-          |-- real HTTP / SSE requests
-          |-- real model calls
-          `-- JSONL / Markdown reports
+```mermaid
+flowchart LR
+    A["Web UI / API Client"] --> B["Flask Web Service<br/>/api/chat / /api/chat/stream"]
+    B --> C["RecipeRAGSystem"]
+    C --> D["TurnRuntimeContext<br/>turn_id / trace_id / replan budget"]
+    D --> E["RAG Runtime Graph"]
+    E --> F["Response Adapter<br/>JSON / SSE"]
+    F --> G["Client Response"]
+```
+
+```mermaid
+flowchart TD
+    Q["用户自然语言问题"] --> SG["Basic Safety Gate<br/>危险/恶意/空输入拦截"]
+    SG --> SNAP["读取 Session Snapshot<br/>session_id + state_version"]
+    SNAP --> TU["Turn Understanding<br/>action + answer_mode_hint"]
+
+    TU --> ACT{"Action"}
+    ACT -->|smalltalk / domain_reject / history_answer| DG["Direct Generation<br/>不进入检索链路"]
+    ACT -->|retrieve_list / retrieve_detail / substitution / compare| RR["Reference Resolution<br/>当前菜品/序号/弱指代解析"]
+    ACT -->|clarification_response| RR
+
+    RR --> AMB{"Blocking Ambiguity?"}
+    AMB -->|yes| CQ["Clarification Question"]
+    AMB -->|no| VC1{"Version Check<br/>pre-plan"}
+    VC1 -->|mismatch| RP["Replan Once<br/>刷新 snapshot"]
+    RP --> SNAP
+    VC1 -->|match| EP["Execution Plan<br/>是否检索 + 答案模式"]
+
+    EP --> NEED{"Needs Retrieval?"}
+    NEED -->|no| DG
+    NEED -->|yes| QP["Query Plan<br/>query / filters / fallback_policy"]
+    QP --> RE["Retrieval Executor"]
+
+    RE --> PR["Primary Retrieval<br/>Vector + BM25 + Metadata Weighting"]
+    PR --> FU["Fusion / RRF"]
+    FU --> EQ{"Evidence Quality"}
+
+    EQ -->|enough| CP["Context Packer<br/>父文档扩展 + 段落选择 + 裁剪"]
+    EQ -->|insufficient + fallback allowed| FB["Controlled Fallback<br/>relaxed filter / broad search"]
+    FB --> FQ{"Fallback Quality"}
+    FQ -->|enough| CP
+    FQ -->|still weak| LOW["Low Evidence / No Result"]
+    EQ -->|insufficient + no fallback| LOW
+
+    CP --> VC2{"Version Check<br/>pre-generation"}
+    VC2 -->|mismatch| RP
+    VC2 -->|match| MODE{"Response Mode"}
+
+    MODE -->|full answer| GEN["Answer Generation<br/>structured / LLM / conservative"]
+    MODE -->|stream| SL["Stream Lifecycle<br/>started -> retrieval_done -> streaming"]
+    SL --> SSE["SSE Chunks"]
+    SSE --> DONE{"Stream Completed?"}
+    DONE -->|yes| GEN
+    DONE -->|aborted / failed| AB["Record Lifecycle Only<br/>不写完整业务状态"]
+
+    DG --> SUP["StateUpdatePolicy<br/>build state_diff"]
+    CQ --> SUP
+    LOW --> SUP
+    GEN --> SUP
+
+    SUP --> VC3{"Version Check<br/>pre-commit"}
+    VC3 -->|match| COMMIT["Versioned State Commit<br/>state_version + 1"]
+    VC3 -->|conflict| CC["Context Conflict Response"]
+
+    COMMIT --> OUT["Return Response"]
+    CC --> OUT
+    AB --> OUT
 ```
 
 主链路围绕一次独立的 turn runtime 展开：请求进入服务后先读取当前 session 快照和 `state_version`，再经过安全检查、轮次理解、指代解析和执行计划，决定是直接回答、拒答、澄清，还是进入检索链路。需要检索时，`RetrievalExecutor` 负责主检索、证据质量判断、受控 fallback、重排和父文档扩展；`ContextPacker` 再把可用证据裁剪成生成层输入。答案生成完成后，系统不会让生成函数直接修改会话，而是由 `StateUpdatePolicy` 构造状态 diff，并在提交前进行版本检查，避免并发或流式中断污染 session 状态。
